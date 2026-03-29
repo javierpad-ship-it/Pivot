@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id           String        @id @default(cuid())
+  name         String
+  location     String
+  createdAt    DateTime      @default(now())
+
+  countTasks   CountTask[]
+  systemStocks SystemStock[]
+}
+
+model Brand {
+  id           String        @id @default(cuid())
+  name         String        @unique
+
+  countTasks   CountTask[]
+  systemStocks SystemStock[]
+}
+
+model ItemCategory {
+  id           String        @id @default(cuid())
+  name         String        @unique
+
+  countTasks   CountTask[]
+  systemStocks SystemStock[]
+}
+
+model CountTask {
+  id          String       @id @default(cuid())
+  storeId     String
+  brandId     String
+  categoryId  String
+  status      String       @default("PENDING")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  store       Store        @relation(fields: [storeId], references: [id])
+  brand       Brand        @relation(fields: [brandId], references: [id])
+  category    ItemCategory @relation(fields: [categoryId], references: [id])
+  countRecord CountRecord?
+
+  @@unique([storeId, brandId, categoryId])
+}
+
+model CountRecord {
+  id           String    @id @default(cuid())
+  taskId       String    @unique
+  quantity     Int
+  employeeName String
+  countedAt    DateTime  @default(now())
+
+  task         CountTask @relation(fields: [taskId], references: [id])
+}
+
+model SystemStock {
+  id             String       @id @default(cuid())
+  storeId        String
+  brandId        String
+  categoryId     String
+  systemQuantity Int
+  updatedAt      DateTime     @updatedAt
+
+  store          Store        @relation(fields: [storeId], references: [id])
+  brand          Brand        @relation(fields: [brandId], references: [id])
+  category       ItemCategory @relation(fields: [categoryId], references: [id])
+
+  @@unique([storeId, brandId, categoryId])
+}
+

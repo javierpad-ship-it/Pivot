@@ -1,0 +1,125 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+
+interface Props {
+  taskId: string;
+  storeId: string;
+}
+
+export function CountForm({ taskId, storeId }: Props) {
+  const router = useRouter();
+  const [quantity, setQuantity] = useState("");
+  const [employeeName, setEmployeeName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const now = new Date().toLocaleString();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    const qty = parseInt(quantity, 10);
+    if (isNaN(qty) || qty < 0) {
+      setError("Please enter a valid quantity (0 or more).");
+      return;
+    }
+    if (!employeeName.trim()) {
+      setError("Please enter the employee name.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/count-records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId, quantity: qty, employeeName: employeeName.trim() }),
+      });
+
+      if (res.status === 409) {
+        setError("This count has already been submitted.");
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Something went wrong.");
+        return;
+      }
+
+      setSuccess(true);
+      setTimeout(() => router.push(`/store/${storeId}`), 2000);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-green-800">Count Submitted!</h2>
+        <p className="text-green-600 mt-2 text-sm">Returning to task list…</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <Input
+        id="quantity"
+        label="Quantity Counted"
+        type="number"
+        inputMode="numeric"
+        min="0"
+        placeholder="0"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+        className="text-2xl py-4 text-center font-bold"
+      />
+
+      <Input
+        id="employee"
+        label="Employee Name"
+        type="text"
+        placeholder="Enter your name"
+        value={employeeName}
+        onChange={(e) => setEmployeeName(e.target.value)}
+        autoComplete="name"
+      />
+
+      <div className="bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-600 flex items-center gap-2">
+        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Date &amp; time will be recorded as: <strong>{now}</strong></span>
+      </div>
+
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <Button
+        type="submit"
+        loading={loading}
+        size="lg"
+        className="w-full mt-4"
+      >
+        Submit Count
+      </Button>
+    </form>
+  );
+}
