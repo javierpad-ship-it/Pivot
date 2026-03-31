@@ -15,18 +15,15 @@ export default async function StorePicker() {
           </svg>
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Select Your Store</h1>
-          <p className="text-sm text-gray-500">Tap your store to view count tasks</p>
+          <h1 className="text-xl font-bold text-gray-900">Selecciona tu Tienda</h1>
+          <p className="text-sm text-gray-500">Toca tu tienda para ver las tareas</p>
         </div>
       </div>
 
       <div className="space-y-3">
         {stores.map((store) => (
-          <Link
-            key={store.id}
-            href={`/store/${store.id}`}
-            className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md hover:border-green-300 transition-all active:scale-[0.98]"
-          >
+          <Link key={store.id} href={`/store/${store.id}`}
+            className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md hover:border-green-300 transition-all active:scale-[0.98]">
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

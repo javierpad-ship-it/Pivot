@@ -11,16 +11,9 @@ function escapeCell(value: string | number | null): string {
 
 export function generateCsv(rows: ReportRow[]): string {
   const headers = [
-    "Store",
-    "Location",
-    "Brand",
-    "Category",
-    "System Qty",
-    "Counted Qty",
-    "Discrepancy",
-    "Discrepancy %",
-    "Employee",
-    "Counted At",
+    "Tienda", "Ubicación", "Marca", "Mundo", "Línea",
+    "Stock Sistema", "Cantidad Contada", "Diferencia", "Diferencia %",
+    "Empleado", "Fecha y Hora",
   ];
 
   const csvRows = rows.map((r) =>
@@ -28,7 +21,8 @@ export function generateCsv(rows: ReportRow[]): string {
       escapeCell(r.store.name),
       escapeCell(r.store.location),
       escapeCell(r.brand.name),
-      escapeCell(r.category.name),
+      escapeCell(r.mundo.name),
+      escapeCell(r.linea.name),
       escapeCell(r.systemQuantity),
       escapeCell(r.countedQuantity),
       escapeCell(r.discrepancy),

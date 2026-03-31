@@ -12,9 +12,16 @@ export interface Brand {
   name: string;
 }
 
-export interface ItemCategory {
+export interface Mundo {
   id: string;
   name: string;
+}
+
+export interface Linea {
+  id: string;
+  name: string;
+  mundoId: string;
+  mundo: Mundo;
 }
 
 export interface CountRecord {
@@ -29,32 +36,22 @@ export interface CountTask {
   id: string;
   storeId: string;
   brandId: string;
-  categoryId: string;
+  lineaId: string;
   status: TaskStatus;
   createdAt: string;
   updatedAt: string;
   store: Store;
   brand: Brand;
-  category: ItemCategory;
+  linea: Linea;
   countRecord: CountRecord | null;
-}
-
-export interface SystemStock {
-  id: string;
-  storeId: string;
-  brandId: string;
-  categoryId: string;
-  systemQuantity: number;
-  store: Store;
-  brand: Brand;
-  category: ItemCategory;
 }
 
 export interface ReportRow {
   taskId: string;
   store: { id: string; name: string; location: string };
   brand: { id: string; name: string };
-  category: { id: string; name: string };
+  mundo: { id: string; name: string };
+  linea: { id: string; name: string };
   countedQuantity: number;
   systemQuantity: number | null;
   discrepancy: number | null;

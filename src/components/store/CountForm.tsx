@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-interface Props {
-  taskId: string;
-  storeId: string;
-}
+interface Props { taskId: string; storeId: string }
 
 export function CountForm({ taskId, storeId }: Props) {
   const router = useRouter();
@@ -18,21 +15,14 @@ export function CountForm({ taskId, storeId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const now = new Date().toLocaleString();
+  const now = new Date().toLocaleString("es");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
     const qty = parseInt(quantity, 10);
-    if (isNaN(qty) || qty < 0) {
-      setError("Please enter a valid quantity (0 or more).");
-      return;
-    }
-    if (!employeeName.trim()) {
-      setError("Please enter the employee name.");
-      return;
-    }
+    if (isNaN(qty) || qty < 0) { setError("Ingresa una cantidad válida (0 o más)."); return; }
+    if (!employeeName.trim()) { setError("Ingresa el nombre del empleado."); return; }
 
     setLoading(true);
     try {
@@ -41,18 +31,8 @@ export function CountForm({ taskId, storeId }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ taskId, quantity: qty, employeeName: employeeName.trim() }),
       });
-
-      if (res.status === 409) {
-        setError("This count has already been submitted.");
-        return;
-      }
-
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? "Something went wrong.");
-        return;
-      }
-
+      if (res.status === 409) { setError("Este conteo ya fue registrado anteriormente."); return; }
+      if (!res.ok) { setError((await res.json()).error ?? "Error al enviar."); return; }
       setSuccess(true);
       setTimeout(() => router.push(`/store/${storeId}`), 2000);
     } finally {
@@ -68,57 +48,36 @@ export function CountForm({ taskId, storeId }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-green-800">Count Submitted!</h2>
-        <p className="text-green-600 mt-2 text-sm">Returning to task list…</p>
+        <h2 className="text-xl font-bold text-green-800">¡Conteo Enviado!</h2>
+        <p className="text-green-600 mt-2 text-sm">Regresando a la lista de tareas…</p>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <Input
-        id="quantity"
-        label="Quantity Counted"
-        type="number"
-        inputMode="numeric"
-        min="0"
-        placeholder="0"
-        value={quantity}
-        onChange={(e) => setQuantity(e.target.value)}
-        className="text-2xl py-4 text-center font-bold"
-      />
+      <Input id="quantity" label="Cantidad Contada" type="number" inputMode="numeric" min="0"
+        placeholder="0" value={quantity} onChange={(e) => setQuantity(e.target.value)}
+        className="text-2xl py-4 text-center font-bold" />
 
-      <Input
-        id="employee"
-        label="Employee Name"
-        type="text"
-        placeholder="Enter your name"
-        value={employeeName}
-        onChange={(e) => setEmployeeName(e.target.value)}
-        autoComplete="name"
-      />
+      <Input id="employee" label="Nombre del Empleado" type="text"
+        placeholder="Ingresa tu nombre" value={employeeName}
+        onChange={(e) => setEmployeeName(e.target.value)} autoComplete="name" />
 
       <div className="bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-600 flex items-center gap-2">
         <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Date &amp; time will be recorded as: <strong>{now}</strong></span>
+        <span>Se registrará como: <strong>{now}</strong></span>
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
-      <Button
-        type="submit"
-        loading={loading}
-        size="lg"
-        className="w-full mt-4"
-      >
-        Submit Count
+      <Button type="submit" loading={loading} size="lg" className="w-full mt-4">
+        Enviar Conteo
       </Button>
     </form>
   );

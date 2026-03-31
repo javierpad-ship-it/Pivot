@@ -5,15 +5,15 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const storeId = searchParams.get("storeId") ?? undefined;
   const brandId = searchParams.get("brandId") ?? undefined;
-  const categoryId = searchParams.get("categoryId") ?? undefined;
+  const lineaId = searchParams.get("lineaId") ?? undefined;
 
   const stock = await prisma.systemStock.findMany({
     where: {
       ...(storeId ? { storeId } : {}),
       ...(brandId ? { brandId } : {}),
-      ...(categoryId ? { categoryId } : {}),
+      ...(lineaId ? { lineaId } : {}),
     },
-    include: { store: true, brand: true, category: true },
+    include: { store: true, brand: true, linea: { include: { mundo: true } } },
     orderBy: [{ store: { name: "asc" } }, { brand: { name: "asc" } }],
   });
 
@@ -22,20 +22,20 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { storeId, brandId, categoryId, systemQuantity } = body;
+  const { storeId, brandId, lineaId, systemQuantity } = body;
 
-  if (!storeId || !brandId || !categoryId || systemQuantity === undefined) {
+  if (!storeId || !brandId || !lineaId || systemQuantity === undefined) {
     return NextResponse.json(
-      { error: "storeId, brandId, categoryId, and systemQuantity are required" },
+      { error: "storeId, brandId, lineaId y systemQuantity son requeridos" },
       { status: 400 }
     );
   }
 
   const entry = await prisma.systemStock.upsert({
-    where: { storeId_brandId_categoryId: { storeId, brandId, categoryId } },
+    where: { storeId_brandId_lineaId: { storeId, brandId, lineaId } },
     update: { systemQuantity: Number(systemQuantity) },
-    create: { storeId, brandId, categoryId, systemQuantity: Number(systemQuantity) },
-    include: { store: true, brand: true, category: true },
+    create: { storeId, brandId, lineaId, systemQuantity: Number(systemQuantity) },
+    include: { store: true, brand: true, linea: { include: { mundo: true } } },
   });
 
   return NextResponse.json(entry);

@@ -7,11 +7,11 @@ export async function GET(
 ) {
   const task = await prisma.countTask.findUnique({
     where: { id: params.id },
-    include: { store: true, brand: true, category: true, countRecord: true },
+    include: { store: true, brand: true, linea: { include: { mundo: true } }, countRecord: true },
   });
 
   if (!task) {
-    return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    return NextResponse.json({ error: "Tarea no encontrada" }, { status: 404 });
   }
 
   return NextResponse.json(task);
@@ -25,13 +25,13 @@ export async function PATCH(
   const { status } = body;
 
   if (!status || !["PENDING", "COMPLETED"].includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
   }
 
   const task = await prisma.countTask.update({
     where: { id: params.id },
     data: { status },
-    include: { store: true, brand: true, category: true, countRecord: true },
+    include: { store: true, brand: true, linea: { include: { mundo: true } }, countRecord: true },
   });
 
   return NextResponse.json(task);

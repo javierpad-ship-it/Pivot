@@ -5,8 +5,8 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const storeId = searchParams.get("storeId") ?? undefined;
   const brandId = searchParams.get("brandId") ?? undefined;
-  const categoryId = searchParams.get("categoryId") ?? undefined;
+  const lineaId = searchParams.get("lineaId") ?? undefined;
 
-  const rows = await getReportData({ storeId, brandId, categoryId });
+  const rows = await getReportData({ storeId, brandId, lineaId });
   return NextResponse.json(rows);
 }

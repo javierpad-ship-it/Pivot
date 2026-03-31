@@ -6,19 +6,19 @@ export async function GET(req: NextRequest) {
   const storeId = searchParams.get("storeId") ?? undefined;
   const status = searchParams.get("status") ?? undefined;
   const brandId = searchParams.get("brandId") ?? undefined;
-  const categoryId = searchParams.get("categoryId") ?? undefined;
+  const lineaId = searchParams.get("lineaId") ?? undefined;
 
   const tasks = await prisma.countTask.findMany({
     where: {
       ...(storeId ? { storeId } : {}),
       ...(status ? { status } : {}),
       ...(brandId ? { brandId } : {}),
-      ...(categoryId ? { categoryId } : {}),
+      ...(lineaId ? { lineaId } : {}),
     },
     include: {
       store: true,
       brand: true,
-      category: true,
+      linea: { include: { mundo: true } },
       countRecord: true,
     },
     orderBy: { createdAt: "desc" },
@@ -29,29 +29,29 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { storeId, brandId, categoryId } = body;
+  const { storeId, brandId, lineaId } = body;
 
-  if (!storeId || !brandId || !categoryId) {
+  if (!storeId || !brandId || !lineaId) {
     return NextResponse.json(
-      { error: "storeId, brandId, and categoryId are required" },
+      { error: "storeId, brandId y lineaId son requeridos" },
       { status: 400 }
     );
   }
 
   const existing = await prisma.countTask.findFirst({
-    where: { storeId, brandId, categoryId },
+    where: { storeId, brandId, lineaId },
   });
 
   if (existing) {
     return NextResponse.json(
-      { error: "A task for this store, brand, and category combination already exists" },
+      { error: "Ya existe una tarea para esta combinación de tienda, marca y línea" },
       { status: 409 }
     );
   }
 
   const task = await prisma.countTask.create({
-    data: { storeId, brandId, categoryId, status: "PENDING" },
-    include: { store: true, brand: true, category: true, countRecord: true },
+    data: { storeId, brandId, lineaId, status: "PENDING" },
+    include: { store: true, brand: true, linea: { include: { mundo: true } }, countRecord: true },
   });
 
   return NextResponse.json(task, { status: 201 });

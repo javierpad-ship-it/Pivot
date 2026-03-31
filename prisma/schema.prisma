@@ -25,29 +25,42 @@ model Brand {
   systemStocks SystemStock[]
 }
 
-model ItemCategory {
-  id           String        @id @default(cuid())
-  name         String        @unique
+model Mundo {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
 
+  lineas    Linea[]
+}
+
+model Linea {
+  id           String        @id @default(cuid())
+  name         String
+  mundoId      String
+  createdAt    DateTime      @default(now())
+
+  mundo        Mundo         @relation(fields: [mundoId], references: [id])
   countTasks   CountTask[]
   systemStocks SystemStock[]
+
+  @@unique([name, mundoId])
 }
 
 model CountTask {
-  id          String       @id @default(cuid())
+  id          String      @id @default(cuid())
   storeId     String
   brandId     String
-  categoryId  String
-  status      String       @default("PENDING")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  lineaId     String
+  status      String      @default("PENDING")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  store       Store        @relation(fields: [storeId], references: [id])
-  brand       Brand        @relation(fields: [brandId], references: [id])
-  category    ItemCategory @relation(fields: [categoryId], references: [id])
+  store       Store       @relation(fields: [storeId], references: [id])
+  brand       Brand       @relation(fields: [brandId], references: [id])
+  linea       Linea       @relation(fields: [lineaId], references: [id])
   countRecord CountRecord?
 
-  @@unique([storeId, brandId, categoryId])
+  @@unique([storeId, brandId, lineaId])
 }
 
 model CountRecord {
@@ -61,17 +74,16 @@ model CountRecord {
 }
 
 model SystemStock {
-  id             String       @id @default(cuid())
+  id             String   @id @default(cuid())
   storeId        String
   brandId        String
-  categoryId     String
+  lineaId        String
   systemQuantity Int
-  updatedAt      DateTime     @updatedAt
+  updatedAt      DateTime @updatedAt
 
-  store          Store        @relation(fields: [storeId], references: [id])
-  brand          Brand        @relation(fields: [brandId], references: [id])
-  category       ItemCategory @relation(fields: [categoryId], references: [id])
+  store          Store    @relation(fields: [storeId], references: [id])
+  brand          Brand    @relation(fields: [brandId], references: [id])
+  linea          Linea    @relation(fields: [lineaId], references: [id])
 
-  @@unique([storeId, brandId, categoryId])
+  @@unique([storeId, brandId, lineaId])
 }
-

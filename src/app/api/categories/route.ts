@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const categories = await prisma.itemCategory.findMany({ orderBy: { name: "asc" } });
-  return NextResponse.json(categories);
+  const lineas = await prisma.linea.findMany({
+    orderBy: [{ mundo: { name: "asc" } }, { name: "asc" }],
+    include: { mundo: true },
+  });
+  return NextResponse.json(lineas);
 }
