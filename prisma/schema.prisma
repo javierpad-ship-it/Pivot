@@ -26,7 +26,8 @@ model Zona {
 model Store {
   id           String        @id @default(cuid())
   name         String
-  location     String
+  distrito     String
+  ciudad       String
   empresaId    String?
   zonaId       String?
   createdAt    DateTime      @default(now())

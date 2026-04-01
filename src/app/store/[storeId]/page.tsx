@@ -30,7 +30,7 @@ export default async function StoreDashboard({ params }: Props) {
         </Link>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-gray-900">{store.name}</h1>
-          <p className="text-sm text-gray-500">{store.location}</p>
+          <p className="text-sm text-gray-500">{store.distrito} · {store.ciudad}</p>
         </div>
       </div>
 

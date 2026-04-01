@@ -34,7 +34,7 @@ export default async function CountPage({ params }: Props) {
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Tienda</p>
             <p className="font-medium text-gray-900">{task.store.name}</p>
-            <p className="text-xs text-gray-500">{task.store.location}</p>
+            <p className="text-xs text-gray-500">{task.store.distrito} · {task.store.ciudad}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Estado</p>

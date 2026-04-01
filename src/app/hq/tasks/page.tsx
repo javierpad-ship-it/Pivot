@@ -101,7 +101,7 @@ export default async function TasksPage({ searchParams }: Props) {
                 <tr key={task.id} className="hover:bg-gray-50">
                   <td className="px-6 py-3">
                     <p className="font-medium text-gray-900">{task.store.name}</p>
-                    <p className="text-xs text-gray-400">{task.store.location}</p>
+                    <p className="text-xs text-gray-400">{task.store.distrito} · {task.store.ciudad}</p>
                   </td>
                   <td className="px-6 py-3 text-gray-700">{task.brand.name}</td>
                   <td className="px-6 py-3 text-gray-700">

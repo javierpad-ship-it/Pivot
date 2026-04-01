@@ -26,7 +26,7 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
     const total = store.countTasks.length;
     const done = store.countTasks.filter((t) => t.countRecord !== null).length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    return { id: store.id, name: store.name, location: store.location, total, done, pct };
+    return { id: store.id, name: store.name, distrito: store.distrito, ciudad: store.ciudad, total, done, pct };
   });
 
   const totalAll = storeStats.reduce((s, t) => s + t.total, 0);
@@ -72,7 +72,7 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <p className="font-semibold text-gray-900">{s.name}</p>
-                    <p className="text-xs text-gray-400">{s.location}</p>
+                    <p className="text-xs text-gray-400">{s.distrito} · {s.ciudad}</p>
                   </div>
                   <span className={`text-sm font-bold ${s.pct === 100 ? "text-green-600" : "text-gray-700"}`}>
                     {s.pct}%

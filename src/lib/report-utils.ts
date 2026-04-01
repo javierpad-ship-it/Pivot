@@ -50,7 +50,7 @@ export async function getReportData(filters: ReportFilters = {}): Promise<Report
 
       return {
         taskId: t.id,
-        store: { id: t.store.id, name: t.store.name, location: t.store.location },
+        store: { id: t.store.id, name: t.store.name, distrito: t.store.distrito, ciudad: t.store.ciudad },
         brand: { id: t.brand.id, name: t.brand.name },
         mundo: { id: t.linea.mundo.id, name: t.linea.mundo.name },
         linea: { id: t.linea.id, name: t.linea.name },

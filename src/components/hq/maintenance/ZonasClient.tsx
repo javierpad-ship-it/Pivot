@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface Store { id: string; name: string; location: string }
+interface Store { id: string; name: string; distrito: string; ciudad: string }
 interface Zona { id: string; name: string; stores: Store[] }
 
 interface Props {

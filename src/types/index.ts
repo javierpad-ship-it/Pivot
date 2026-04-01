@@ -3,7 +3,8 @@ export type TaskStatus = "PENDING" | "COMPLETED";
 export interface Store {
   id: string;
   name: string;
-  location: string;
+  distrito: string;
+  ciudad: string;
   createdAt: string;
 }
 
@@ -48,7 +49,7 @@ export interface CountTask {
 
 export interface ReportRow {
   taskId: string;
-  store: { id: string; name: string; location: string };
+  store: { id: string; name: string; distrito: string; ciudad: string };
   brand: { id: string; name: string };
   mundo: { id: string; name: string };
   linea: { id: string; name: string };

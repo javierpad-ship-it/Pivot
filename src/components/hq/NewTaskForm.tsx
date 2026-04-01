@@ -6,7 +6,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 
-interface Store { id: string; name: string; location: string }
+interface Store { id: string; name: string; distrito: string; ciudad: string }
 interface Brand { id: string; name: string }
 interface Mundo { id: string; name: string }
 interface Linea { id: string; name: string; mundoId: string; mundo: Mundo }
@@ -81,7 +81,7 @@ export function NewTaskForm({ stores, brands, lineas }: Props) {
         <form onSubmit={handleSubmit} className="space-y-5">
           <Select id="store" label="Tienda" placeholder="Selecciona una tienda…"
             value={storeId} onChange={(e) => setStoreId(e.target.value)}
-            options={stores.map((s) => ({ value: s.id, label: `${s.name} — ${s.location}` }))} />
+            options={stores.map((s) => ({ value: s.id, label: `${s.name} — ${s.ciudad}` }))} />
 
           <Select id="brand" label="Marca" placeholder="Selecciona una marca…"
             value={brandId} onChange={(e) => setBrandId(e.target.value)}
