@@ -1,2 +1,2 @@
 [variables]
-DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+DATABASE_URL = "${{ Postgres.DATABASE_URL }}"
