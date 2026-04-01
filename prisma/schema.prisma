@@ -23,27 +23,40 @@ model Zona {
   stores    Store[]
 }
 
-model Store {
-  id           String        @id @default(cuid())
-  name         String
-  distrito     String
-  ciudad       String
-  empresaId    String?
-  zonaId       String?
-  createdAt    DateTime      @default(now())
+model Genero {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  createdAt       DateTime         @default(now())
 
-  empresa      Empresa?      @relation(fields: [empresaId], references: [id])
-  zona         Zona?         @relation(fields: [zonaId], references: [id])
-  countTasks   CountTask[]
-  systemStocks SystemStock[]
+  programaciones  Programacion[]
+  conteoRegistros ConteoRegistro[]
+}
+
+model Store {
+  id              String           @id @default(cuid())
+  name            String
+  distrito        String
+  ciudad          String
+  empresaId       String?
+  zonaId          String?
+  createdAt       DateTime         @default(now())
+
+  empresa         Empresa?         @relation(fields: [empresaId], references: [id])
+  zona            Zona?            @relation(fields: [zonaId], references: [id])
+  countTasks      CountTask[]
+  systemStocks    SystemStock[]
+  programaciones  Programacion[]
+  conteoRegistros ConteoRegistro[]
 }
 
 model Brand {
-  id           String        @id @default(cuid())
-  name         String        @unique
+  id              String           @id @default(cuid())
+  name            String           @unique
 
-  countTasks   CountTask[]
-  systemStocks SystemStock[]
+  countTasks      CountTask[]
+  systemStocks    SystemStock[]
+  programaciones  Programacion[]
+  conteoRegistros ConteoRegistro[]
 }
 
 model Mundo {
@@ -55,14 +68,16 @@ model Mundo {
 }
 
 model Linea {
-  id           String        @id @default(cuid())
-  name         String
-  mundoId      String
-  createdAt    DateTime      @default(now())
+  id              String           @id @default(cuid())
+  name            String
+  mundoId         String
+  createdAt       DateTime         @default(now())
 
-  mundo        Mundo         @relation(fields: [mundoId], references: [id])
-  countTasks   CountTask[]
-  systemStocks SystemStock[]
+  mundo           Mundo            @relation(fields: [mundoId], references: [id])
+  countTasks      CountTask[]
+  systemStocks    SystemStock[]
+  programaciones  Programacion[]
+  conteoRegistros ConteoRegistro[]
 
   @@unique([name, mundoId])
 }
@@ -107,4 +122,42 @@ model SystemStock {
   linea          Linea    @relation(fields: [lineaId], references: [id])
 
   @@unique([storeId, brandId, lineaId])
+}
+
+// --- SISTEMA DE PROGRAMACIÓN SEMANAL ---
+
+model Programacion {
+  id        String   @id @default(cuid())
+  storeId   String
+  dayOfWeek Int      // 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves
+  brandId   String
+  lineaId   String
+  generoId  String
+  createdAt DateTime @default(now())
+
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  brand     Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  linea     Linea   @relation(fields: [lineaId], references: [id], onDelete: Cascade)
+  genero    Genero  @relation(fields: [generoId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, dayOfWeek, brandId, lineaId, generoId])
+}
+
+model ConteoRegistro {
+  id        String   @id @default(cuid())
+  storeId   String
+  brandId   String
+  lineaId   String
+  generoId  String
+  fecha     DateTime @db.Date
+  cantidad  Int
+  empleado  String
+  creadoEn  DateTime @default(now())
+
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  brand     Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  linea     Linea   @relation(fields: [lineaId], references: [id], onDelete: Cascade)
+  genero    Genero  @relation(fields: [generoId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, brandId, lineaId, generoId, fecha])
 }

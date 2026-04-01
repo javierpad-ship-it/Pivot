@@ -2,19 +2,31 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 
 export const dynamic = "force-dynamic";
 
+const DAY_NAMES = ["", "Lunes", "Martes", "Miércoles", "Jueves"];
+
 export default async function HQDashboard() {
-  const [total, pending, completed, recentTasks] = await Promise.all([
+  const today = new Date();
+  const todayJs = today.getDay(); // 0=Sun…6=Sat
+  const todayStr = today.toISOString().split("T")[0];
+  const isScheduleDay = todayJs >= 1 && todayJs <= 4;
+
+  const [
+    totalTasks, pendingTasks, completedTasks,
+    totalProgramado, totalContado,
+    recentConteos,
+  ] = await Promise.all([
     prisma.countTask.count(),
     prisma.countTask.count({ where: { status: "PENDING" } }),
     prisma.countTask.count({ where: { status: "COMPLETED" } }),
-    prisma.countTask.findMany({
+    isScheduleDay ? prisma.programacion.count({ where: { dayOfWeek: todayJs } }) : Promise.resolve(0),
+    isScheduleDay ? prisma.conteoRegistro.count({ where: { fecha: new Date(todayStr) } }) : Promise.resolve(0),
+    prisma.conteoRegistro.findMany({
       take: 8,
-      orderBy: { createdAt: "desc" },
-      include: { store: true, brand: true, linea: { include: { mundo: true } } },
+      orderBy: { creadoEn: "desc" },
+      include: { store: true, brand: true, linea: { include: { mundo: true } }, genero: true },
     }),
   ]);
 
@@ -23,65 +35,97 @@ export default async function HQDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Resumen de tareas de conteo cíclico</p>
+          <p className="text-gray-500 text-sm mt-1">Resumen de conteos cíclicos</p>
         </div>
-        <Link href="/hq/tasks/new">
-          <Button size="md">
+        <Link href="/hq/programacion">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            Nueva Tarea
-          </Button>
+            Programación
+          </button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 mb-8">
+      {/* Programacion de hoy (solo Lun-Jue) */}
+      {isScheduleDay && (
+        <div className="mb-6">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            Hoy — {DAY_NAMES[todayJs]}
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <Card><CardBody>
+              <p className="text-sm text-gray-500">Programados hoy</p>
+              <p className="text-3xl font-bold text-blue-700 mt-1">{totalProgramado}</p>
+            </CardBody></Card>
+            <Card><CardBody>
+              <p className="text-sm text-gray-500">Contados hoy</p>
+              <p className="text-3xl font-bold text-green-600 mt-1">{totalContado}</p>
+              {totalProgramado > 0 && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {Math.round((totalContado / totalProgramado) * 100)}% completado
+                </p>
+              )}
+            </CardBody></Card>
+          </div>
+        </div>
+      )}
+
+      {/* Tareas individuales */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <Card><CardBody>
-          <p className="text-sm text-gray-500">Total Tareas</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{total}</p>
+          <p className="text-sm text-gray-500">Tareas Total</p>
+          <p className="text-3xl font-bold text-gray-900 mt-1">{totalTasks}</p>
         </CardBody></Card>
         <Card><CardBody>
           <p className="text-sm text-gray-500">Pendientes</p>
-          <p className="text-3xl font-bold text-yellow-600 mt-1">{pending}</p>
+          <p className="text-3xl font-bold text-yellow-600 mt-1">{pendingTasks}</p>
         </CardBody></Card>
         <Card><CardBody>
           <p className="text-sm text-gray-500">Completadas</p>
-          <p className="text-3xl font-bold text-green-600 mt-1">{completed}</p>
+          <p className="text-3xl font-bold text-green-600 mt-1">{completedTasks}</p>
         </CardBody></Card>
       </div>
 
+      {/* Conteos recientes de la matriz */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">Tareas Recientes</h2>
-            <Link href="/hq/tasks" className="text-sm text-blue-600 hover:underline">Ver todas</Link>
-          </div>
+          <h2 className="font-semibold text-gray-900">Conteos Recientes (Programación)</h2>
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Tienda</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Marca</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Mundo / Línea</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Estado</th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Creada</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Tienda</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Marca</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Mundo / Línea</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Género</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Cantidad</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Fecha</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {recentTasks.map((task) => (
-                <tr key={task.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-3 font-medium text-gray-900">{task.store.name}</td>
-                  <td className="px-6 py-3 text-gray-600">{task.brand.name}</td>
-                  <td className="px-6 py-3 text-gray-600">
-                    <span className="text-xs text-gray-400">{task.linea.mundo.name} /</span> {task.linea.name}
+              {recentConteos.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                    No hay conteos registrados aún
                   </td>
-                  <td className="px-6 py-3">
-                    <Badge variant={task.status === "COMPLETED" ? "green" : "yellow"}>
-                      {task.status === "COMPLETED" ? "Completada" : "Pendiente"}
-                    </Badge>
+                </tr>
+              ) : recentConteos.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{c.store.name}</td>
+                  <td className="px-4 py-3 text-gray-600">{c.brand.name}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    <span className="text-xs text-gray-400">{c.linea.mundo.name} /</span> {c.linea.name}
                   </td>
-                  <td className="px-6 py-3 text-gray-500">{new Date(task.createdAt).toLocaleDateString("es")}</td>
+                  <td className="px-4 py-3">
+                    <Badge variant="yellow">{c.genero.name}</Badge>
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-gray-900">{c.cantidad}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">
+                    {new Date(c.fecha).toLocaleDateString("es")}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -90,17 +134,18 @@ export default async function HQDashboard() {
       </Card>
 
       <div className="mt-6 grid grid-cols-3 gap-4">
-        <Link href="/hq/tasks/new">
+        <Link href="/hq/programacion">
           <Card className="hover:border-blue-300 transition-colors cursor-pointer">
             <CardBody className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-gray-900">Crear Tarea</p>
-                <p className="text-xs text-gray-500">Asignar conteo a tienda</p>
+                <p className="font-medium text-gray-900">Programación</p>
+                <p className="text-xs text-gray-500">Matriz semanal Lun-Jue</p>
               </div>
             </CardBody>
           </Card>
@@ -116,7 +161,7 @@ export default async function HQDashboard() {
               </div>
               <div>
                 <p className="font-medium text-gray-900">Reportes</p>
-                <p className="text-xs text-gray-500">Comparar vs stock sistema</p>
+                <p className="text-xs text-gray-500">Historial de conteos</p>
               </div>
             </CardBody>
           </Card>
@@ -133,7 +178,7 @@ export default async function HQDashboard() {
               </div>
               <div>
                 <p className="font-medium text-gray-900">Mantenimiento</p>
-                <p className="text-xs text-gray-500">Tiendas, marcas, mundos, líneas</p>
+                <p className="text-xs text-gray-500">Tiendas, marcas, géneros…</p>
               </div>
             </CardBody>
           </Card>

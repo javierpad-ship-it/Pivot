@@ -4,27 +4,47 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+const DAY_NAMES = ["", "Lunes", "Martes", "Miércoles", "Jueves"];
+
 export default async function ZonaProgressPage({ params }: { params: { zonaId: string } }) {
   const zona = await prisma.zona.findUnique({
     where: { id: params.zonaId },
-    include: {
-      stores: {
-        orderBy: { name: "asc" },
-        include: {
-          _count: { select: { countTasks: true } },
-          countTasks: {
-            select: { id: true, countRecord: { select: { id: true } } },
-          },
-        },
-      },
-    },
+    include: { stores: { orderBy: { name: "asc" } } },
   });
 
   if (!zona) notFound();
 
+  const today = new Date();
+  const todayJs = today.getDay();
+  const todayStr = today.toISOString().split("T")[0];
+  const isScheduleDay = todayJs >= 1 && todayJs <= 4;
+
+  const storeIds = zona.stores.map((s) => s.id);
+
+  // Today's programmed count per store
+  const [programados, contados] = await Promise.all([
+    isScheduleDay
+      ? prisma.programacion.findMany({
+          where: { storeId: { in: storeIds }, dayOfWeek: todayJs },
+          select: { storeId: true },
+        })
+      : Promise.resolve([]),
+    isScheduleDay
+      ? prisma.conteoRegistro.findMany({
+          where: { storeId: { in: storeIds }, fecha: new Date(todayStr) },
+          select: { storeId: true },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const progByStore: Record<string, number> = {};
+  const contByStore: Record<string, number> = {};
+  for (const p of programados) progByStore[p.storeId] = (progByStore[p.storeId] ?? 0) + 1;
+  for (const c of contados) contByStore[c.storeId] = (contByStore[c.storeId] ?? 0) + 1;
+
   const storeStats = zona.stores.map((store) => {
-    const total = store.countTasks.length;
-    const done = store.countTasks.filter((t) => t.countRecord !== null).length;
+    const total = progByStore[store.id] ?? 0;
+    const done = contByStore[store.id] ?? 0;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
     return { id: store.id, name: store.name, distrito: store.distrito, ciudad: store.ciudad, total, done, pct };
   });
@@ -42,23 +62,28 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
             ← Zonas
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{zona.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">Avance de conteos por tienda</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Avance de conteos — {isScheduleDay ? DAY_NAMES[todayJs] : "Sin programación hoy (Vie-Dom)"}
+          </p>
         </div>
 
         {/* Summary card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-600">Avance total de la zona</p>
-            <span className="text-lg font-bold text-teal-700">{pctAll}%</span>
+        {isScheduleDay ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-600">Avance total de la zona hoy</p>
+              <span className="text-lg font-bold text-teal-700">{pctAll}%</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-3">
+              <div className="bg-teal-500 h-3 rounded-full transition-all" style={{ width: `${pctAll}%` }} />
+            </div>
+            <p className="text-xs text-gray-400 mt-2">{doneAll} de {totalAll} conteos completados</p>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3">
-            <div
-              className="bg-teal-500 h-3 rounded-full transition-all"
-              style={{ width: `${pctAll}%` }}
-            />
+        ) : (
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-6 text-center text-gray-400 text-sm">
+            Los conteos se programan de Lunes a Jueves
           </div>
-          <p className="text-xs text-gray-400 mt-2">{doneAll} de {totalAll} tareas completadas</p>
-        </div>
+        )}
 
         {/* Per-store list */}
         {storeStats.length === 0 ? (
@@ -74,21 +99,25 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
                     <p className="font-semibold text-gray-900">{s.name}</p>
                     <p className="text-xs text-gray-400">{s.distrito} · {s.ciudad}</p>
                   </div>
-                  <span className={`text-sm font-bold ${s.pct === 100 ? "text-green-600" : "text-gray-700"}`}>
-                    {s.pct}%
-                  </span>
+                  {isScheduleDay && (
+                    <span className={`text-sm font-bold ${s.pct === 100 ? "text-green-600" : "text-gray-700"}`}>
+                      {s.pct}%
+                    </span>
+                  )}
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all ${s.pct === 100 ? "bg-green-500" : "bg-teal-500"}`}
-                    style={{ width: `${s.pct}%` }}
-                  />
-                </div>
-                {s.total > 0 && (
-                  <p className="text-xs text-gray-400 mt-1.5">{s.done} de {s.total} tareas completadas</p>
+                {isScheduleDay && s.total > 0 && (
+                  <>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all ${s.pct === 100 ? "bg-green-500" : "bg-teal-500"}`}
+                        style={{ width: `${s.pct}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1.5">{s.done} de {s.total} conteos completados</p>
+                  </>
                 )}
-                {s.total === 0 && (
-                  <p className="text-xs text-gray-400 mt-1.5">Sin tareas asignadas</p>
+                {isScheduleDay && s.total === 0 && (
+                  <p className="text-xs text-gray-400 mt-1">Sin ítems programados hoy</p>
                 )}
               </div>
             ))}
