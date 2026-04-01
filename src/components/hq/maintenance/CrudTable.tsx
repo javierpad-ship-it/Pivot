@@ -13,12 +13,21 @@ export interface Row {
   [key: string]: string;
 }
 
+export interface FormField {
+  key: string;
+  label: string;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+}
+
 interface Props {
   columns: Column[];
   rows: Row[];
   onSave: (id: string | null, data: Record<string, string>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  formFields: { key: string; label: string; placeholder?: string; type?: string }[];
+  formFields: FormField[];
   emptyText?: string;
 }
 
@@ -95,14 +104,27 @@ export function CrudTable({ columns, rows, onSave, onDelete, formFields, emptyTe
             {formFields.map((f) => (
               <div key={f.key} className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-gray-600">{f.label}</label>
-                <input
-                  type={f.type ?? "text"}
-                  placeholder={f.placeholder}
-                  value={formData[f.key] ?? ""}
-                  onChange={(e) => setFormData((d) => ({ ...d, [f.key]: e.target.value }))}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+                {f.type === "select" ? (
+                  <select
+                    value={formData[f.key] ?? ""}
+                    onChange={(e) => setFormData((d) => ({ ...d, [f.key]: e.target.value }))}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required={f.required ?? false}
+                  >
+                    {f.options?.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={f.type ?? "text"}
+                    placeholder={f.placeholder}
+                    value={formData[f.key] ?? ""}
+                    onChange={(e) => setFormData((d) => ({ ...d, [f.key]: e.target.value }))}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required={f.required ?? true}
+                  />
+                )}
               </div>
             ))}
           </div>

@@ -7,12 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Empresa {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  stores    Store[]
+}
+
+model Zona {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  stores    Store[]
+}
+
 model Store {
   id           String        @id @default(cuid())
   name         String
   location     String
+  empresaId    String?
+  zonaId       String?
   createdAt    DateTime      @default(now())
 
+  empresa      Empresa?      @relation(fields: [empresaId], references: [id])
+  zona         Zona?         @relation(fields: [zonaId], references: [id])
   countTasks   CountTask[]
   systemStocks SystemStock[]
 }

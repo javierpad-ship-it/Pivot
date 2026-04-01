@@ -14,6 +14,30 @@ const sections = [
     color: "bg-blue-100 group-hover:bg-blue-200",
   },
   {
+    href: "/hq/mantenimiento/empresas",
+    label: "Empresas",
+    desc: "Agregar, editar o eliminar empresas",
+    icon: (
+      <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
+    color: "bg-indigo-100 group-hover:bg-indigo-200",
+  },
+  {
+    href: "/hq/mantenimiento/zonas",
+    label: "Zonas",
+    desc: "Crear zonas y asignar tiendas",
+    icon: (
+      <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+      </svg>
+    ),
+    color: "bg-teal-100 group-hover:bg-teal-200",
+  },
+  {
     href: "/hq/mantenimiento/marcas",
     label: "Marcas",
     desc: "Agregar, editar o eliminar marcas",
@@ -56,10 +80,10 @@ export default function MantenimientoPage() {
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Mantenimiento</h1>
-        <p className="text-sm text-gray-500 mt-1">Administra tiendas, marcas, mundos y líneas</p>
+        <p className="text-sm text-gray-500 mt-1">Administra tiendas, empresas, zonas, marcas, mundos y líneas</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 max-w-2xl">
+      <div className="grid grid-cols-2 gap-4 max-w-2xl sm:grid-cols-3">
         {sections.map((s) => (
           <Link key={s.href} href={s.href}
             className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all">

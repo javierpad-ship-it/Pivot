@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const { name, location } = await req.json();
+  const { name, location, empresaId } = await req.json();
   if (!name?.trim() || !location?.trim()) {
     return NextResponse.json({ error: "Nombre y ubicación son requeridos" }, { status: 400 });
   }
   const store = await prisma.store.update({
     where: { id: params.id },
-    data: { name: name.trim(), location: location.trim() },
+    data: { name: name.trim(), location: location.trim(), empresaId: empresaId || null },
+    include: { empresa: true, zona: true },
   });
   return NextResponse.json(store);
 }

@@ -4,18 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CrudTable } from "./CrudTable";
 
-interface Tienda { id: string; name: string; location: string }
+interface Empresa { id: string; name: string }
+interface Tienda { id: string; name: string; location: string; empresaId: string | null; empresa: Empresa | null }
 
-export function TiendasClient({ tiendas }: { tiendas: Tienda[] }) {
+interface Props {
+  tiendas: Tienda[];
+  empresas: Empresa[];
+}
+
+export function TiendasClient({ tiendas, empresas }: Props) {
   const router = useRouter();
   const [data, setData] = useState(tiendas);
 
   async function handleSave(id: string | null, form: Record<string, string>) {
+    const empresaId = form.empresaId || null;
     if (id) {
       const res = await fetch(`/api/stores/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, location: form.location }),
+        body: JSON.stringify({ name: form.name, location: form.location, empresaId }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       const updated = await res.json();
@@ -24,7 +31,7 @@ export function TiendasClient({ tiendas }: { tiendas: Tienda[] }) {
       const res = await fetch("/api/stores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, location: form.location }),
+        body: JSON.stringify({ name: form.name, location: form.location, empresaId }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       const created = await res.json();
@@ -39,16 +46,29 @@ export function TiendasClient({ tiendas }: { tiendas: Tienda[] }) {
     setData((d) => d.filter((t) => t.id !== id));
   }
 
+  const empresaOptions = [
+    { value: "", label: "Sin empresa" },
+    ...empresas.map((e) => ({ value: e.id, label: e.name })),
+  ];
+
   return (
     <CrudTable
       columns={[
         { key: "name", label: "Nombre" },
         { key: "location", label: "Ubicación" },
+        { key: "empresaName", label: "Empresa" },
       ]}
-      rows={data.map((t) => ({ id: t.id, name: t.name, location: t.location }))}
+      rows={data.map((t) => ({
+        id: t.id,
+        name: t.name,
+        location: t.location,
+        empresaId: t.empresaId ?? "",
+        empresaName: t.empresa?.name ?? "—",
+      }))}
       formFields={[
         { key: "name", label: "Nombre", placeholder: "Ej: Tienda Centro" },
         { key: "location", label: "Ubicación", placeholder: "Ej: Ciudad de México" },
+        { key: "empresaId", label: "Empresa", type: "select", options: empresaOptions },
       ]}
       onSave={handleSave}
       onDelete={handleDelete}
