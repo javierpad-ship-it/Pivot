@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   return new Response(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="conteo-ciclico-${date}.csv"`,
+      "Content-Disposition": `attachment; filename="konteo-${date}.csv"`,
     },
   });
 }

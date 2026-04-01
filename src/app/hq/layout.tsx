@@ -61,7 +61,7 @@ export default function HQLayout({ children }: { children: React.ReactNode }) {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">Conteo Cíclico</p>
+            <p className="text-sm font-semibold text-gray-900">Konteo</p>
             <p className="text-xs text-gray-500">Casa Matriz</p>
           </div>
         </div>

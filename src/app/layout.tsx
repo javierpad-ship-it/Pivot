@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Inventory Cycle Counting",
-  description: "Retail inventory cycle counting management system",
+  title: "Konteo",
+  description: "Sistema de conteo cíclico de inventario para tiendas Lukers",
 };
 
 export const viewport: Viewport = {
@@ -14,7 +14,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className="bg-gray-50 text-gray-900 antialiased">{children}</body>
     </html>
   );
