@@ -14,23 +14,23 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "next": "14.2.29",
     "@prisma/client": "^5.22.0",
+    "next": "^14.2.35",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "prisma": "^5.22.0",
-    "typescript": "^5",
+    "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/node": "^20",
-    "tailwindcss": "^3.4",
-    "postcss": "^8",
     "autoprefixer": "^10",
-    "ts-node": "^10",
     "eslint": "^8",
-    "eslint-config-next": "14.2.29"
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4",
+    "ts-node": "^10",
+    "typescript": "^5"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
