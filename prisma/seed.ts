@@ -6,19 +6,34 @@ async function main() {
   // Stores
   const stores = await Promise.all([
     prisma.store.upsert({
-      where: { id: "store-downtown" },
-      update: {},
-      create: { id: "store-downtown", name: "Downtown Flagship", location: "New York, NY" },
+      where: { id: "store-el-sol" },
+      update: { name: "El Sol", location: "Chorrillos" },
+      create: { id: "store-el-sol", name: "El Sol", location: "Chorrillos" },
     }),
     prisma.store.upsert({
-      where: { id: "store-westside" },
-      update: {},
-      create: { id: "store-westside", name: "Westside Mall", location: "Los Angeles, CA" },
+      where: { id: "store-alfonso-ugarte" },
+      update: { name: "Alfonso Ugarte", location: "Breña" },
+      create: { id: "store-alfonso-ugarte", name: "Alfonso Ugarte", location: "Breña" },
     }),
     prisma.store.upsert({
-      where: { id: "store-northgate" },
-      update: {},
-      create: { id: "store-northgate", name: "Northgate Center", location: "Chicago, IL" },
+      where: { id: "store-prol-iquitos" },
+      update: { name: "Prolongación Iquitos", location: "Lince" },
+      create: { id: "store-prol-iquitos", name: "Prolongación Iquitos", location: "Lince" },
+    }),
+    prisma.store.upsert({
+      where: { id: "store-jiron-union" },
+      update: { name: "Jirón de la Unión", location: "Lima" },
+      create: { id: "store-jiron-union", name: "Jirón de la Unión", location: "Lima" },
+    }),
+    prisma.store.upsert({
+      where: { id: "store-la-marina" },
+      update: { name: "La Marina", location: "Jesús María" },
+      create: { id: "store-la-marina", name: "La Marina", location: "Jesús María" },
+    }),
+    prisma.store.upsert({
+      where: { id: "store-mendiola" },
+      update: { name: "Mendiola", location: "Independencia" },
+      create: { id: "store-mendiola", name: "Mendiola", location: "Independencia" },
     }),
   ]);
 
@@ -61,6 +76,9 @@ async function main() {
     [85, 110, 76, 62],
     [98, 124, 53, 81],
     [104, 91, 148, 113],
+    [72, 88, 135, 49],
+    [115, 67, 93, 156],
+    [88, 102, 61, 74],
   ];
 
   for (let si = 0; si < stores.length; si++) {
@@ -78,18 +96,18 @@ async function main() {
 
   // Count tasks: 6 COMPLETED, 6 PENDING
   const taskDefs = [
-    { storeId: "store-downtown", brandId: "brand-alphawear", lineaId: "linea-ropa-hombre", status: "COMPLETED", qty: 88, employee: "Maria Garcia" },
-    { storeId: "store-downtown", brandId: "brand-betasport", lineaId: "linea-audio", status: "COMPLETED", qty: 55, employee: "James Chen" },
-    { storeId: "store-westside", brandId: "brand-gammahome", lineaId: "linea-cocina", status: "COMPLETED", qty: 45, employee: "Lisa Park" },
-    { storeId: "store-westside", brandId: "brand-deltaelectronics", lineaId: "linea-ropa-hombre", status: "COMPLETED", qty: 98, employee: "Tom Rivera" },
-    { storeId: "store-northgate", brandId: "brand-epsilonbeauty", lineaId: "linea-skincare", status: "COMPLETED", qty: 120, employee: "Sarah Kim" },
-    { storeId: "store-northgate", brandId: "brand-alphawear", lineaId: "linea-audio", status: "COMPLETED", qty: 80, employee: "David Osei" },
-    { storeId: "store-downtown", brandId: "brand-gammahome", lineaId: "linea-skincare", status: "PENDING", qty: null, employee: null },
-    { storeId: "store-downtown", brandId: "brand-epsilonbeauty", lineaId: "linea-cocina", status: "PENDING", qty: null, employee: null },
-    { storeId: "store-westside", brandId: "brand-alphawear", lineaId: "linea-skincare", status: "PENDING", qty: null, employee: null },
-    { storeId: "store-westside", brandId: "brand-betasport", lineaId: "linea-ropa-hombre", status: "PENDING", qty: null, employee: null },
-    { storeId: "store-northgate", brandId: "brand-deltaelectronics", lineaId: "linea-cocina", status: "PENDING", qty: null, employee: null },
-    { storeId: "store-northgate", brandId: "brand-betasport", lineaId: "linea-audio", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-el-sol", brandId: "brand-alphawear", lineaId: "linea-ropa-hombre", status: "COMPLETED", qty: 88, employee: "Carlos Quispe" },
+    { storeId: "store-alfonso-ugarte", brandId: "brand-betasport", lineaId: "linea-audio", status: "COMPLETED", qty: 55, employee: "Rosa Mamani" },
+    { storeId: "store-prol-iquitos", brandId: "brand-gammahome", lineaId: "linea-cocina", status: "COMPLETED", qty: 45, employee: "Jorge Huanca" },
+    { storeId: "store-jiron-union", brandId: "brand-deltaelectronics", lineaId: "linea-ropa-hombre", status: "COMPLETED", qty: 98, employee: "Ana Torres" },
+    { storeId: "store-la-marina", brandId: "brand-epsilonbeauty", lineaId: "linea-skincare", status: "COMPLETED", qty: 120, employee: "Luis Flores" },
+    { storeId: "store-mendiola", brandId: "brand-alphawear", lineaId: "linea-audio", status: "COMPLETED", qty: 80, employee: "María Sánchez" },
+    { storeId: "store-el-sol", brandId: "brand-gammahome", lineaId: "linea-skincare", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-alfonso-ugarte", brandId: "brand-epsilonbeauty", lineaId: "linea-cocina", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-prol-iquitos", brandId: "brand-alphawear", lineaId: "linea-skincare", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-jiron-union", brandId: "brand-betasport", lineaId: "linea-ropa-hombre", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-la-marina", brandId: "brand-deltaelectronics", lineaId: "linea-cocina", status: "PENDING", qty: null, employee: null },
+    { storeId: "store-mendiola", brandId: "brand-betasport", lineaId: "linea-audio", status: "PENDING", qty: null, employee: null },
   ];
 
   for (const def of taskDefs) {
@@ -109,7 +127,7 @@ async function main() {
     }
   }
 
-  console.log("Seed completo: 3 tiendas, 5 marcas, 4 mundos, 8 líneas, 12 tareas.");
+  console.log("Seed completo: 6 tiendas, 5 marcas, 4 mundos, 8 líneas, 12 tareas.");
 }
 
 main()
