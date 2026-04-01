@@ -7,33 +7,33 @@ async function main() {
   const stores = await Promise.all([
     prisma.store.upsert({
       where: { id: "store-el-sol" },
-      update: { name: "El Sol", location: "Chorrillos" },
-      create: { id: "store-el-sol", name: "El Sol", location: "Chorrillos" },
+      update: { name: "El Sol", distrito: "Chorrillos", ciudad: "Lima" },
+      create: { id: "store-el-sol", name: "El Sol", distrito: "Chorrillos", ciudad: "Lima" },
     }),
     prisma.store.upsert({
       where: { id: "store-alfonso-ugarte" },
-      update: { name: "Alfonso Ugarte", location: "Breña" },
-      create: { id: "store-alfonso-ugarte", name: "Alfonso Ugarte", location: "Breña" },
+      update: { name: "Alfonso Ugarte", distrito: "Breña", ciudad: "Lima" },
+      create: { id: "store-alfonso-ugarte", name: "Alfonso Ugarte", distrito: "Breña", ciudad: "Lima" },
     }),
     prisma.store.upsert({
       where: { id: "store-prol-iquitos" },
-      update: { name: "Prolongación Iquitos", location: "Lince" },
-      create: { id: "store-prol-iquitos", name: "Prolongación Iquitos", location: "Lince" },
+      update: { name: "Prolongación Iquitos", distrito: "Lince", ciudad: "Lima" },
+      create: { id: "store-prol-iquitos", name: "Prolongación Iquitos", distrito: "Lince", ciudad: "Lima" },
     }),
     prisma.store.upsert({
       where: { id: "store-jiron-union" },
-      update: { name: "Jirón de la Unión", location: "Lima" },
-      create: { id: "store-jiron-union", name: "Jirón de la Unión", location: "Lima" },
+      update: { name: "Jirón de la Unión", distrito: "Cercado", ciudad: "Lima" },
+      create: { id: "store-jiron-union", name: "Jirón de la Unión", distrito: "Cercado", ciudad: "Lima" },
     }),
     prisma.store.upsert({
       where: { id: "store-la-marina" },
-      update: { name: "La Marina", location: "Jesús María" },
-      create: { id: "store-la-marina", name: "La Marina", location: "Jesús María" },
+      update: { name: "La Marina", distrito: "Jesús María", ciudad: "Lima" },
+      create: { id: "store-la-marina", name: "La Marina", distrito: "Jesús María", ciudad: "Lima" },
     }),
     prisma.store.upsert({
       where: { id: "store-mendiola" },
-      update: { name: "Mendiola", location: "Independencia" },
-      create: { id: "store-mendiola", name: "Mendiola", location: "Independencia" },
+      update: { name: "Mendiola", distrito: "Independencia", ciudad: "Lima" },
+      create: { id: "store-mendiola", name: "Mendiola", distrito: "Independencia", ciudad: "Lima" },
     }),
   ]);
 
