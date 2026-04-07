@@ -37,6 +37,20 @@ export function CrudTable({ columns, rows, onSave, onDelete, formFields, emptyTe
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  function handleSort(key: string) {
+    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  }
+
+  const sortedRows = sortKey
+    ? [...rows].sort((a, b) => {
+        const cmp = (a[sortKey] ?? "").localeCompare(b[sortKey] ?? "", "es", { sensitivity: "base" });
+        return sortDir === "asc" ? cmp : -cmp;
+      })
+    : rows;
 
   function openAdd() {
     setFormData({});
@@ -145,7 +159,17 @@ export function CrudTable({ columns, rows, onSave, onDelete, formFields, emptyTe
             <tr>
               {columns.map((col) => (
                 <th key={col.key} className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  {col.label}
+                  <button
+                    onClick={() => handleSort(col.key)}
+                    className="inline-flex items-center gap-1 hover:text-gray-800 transition-colors"
+                  >
+                    {col.label}
+                    <span className="text-gray-300">
+                      {sortKey === col.key
+                        ? sortDir === "asc" ? "↑" : "↓"
+                        : "↕"}
+                    </span>
+                  </button>
                 </th>
               ))}
               <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide text-right">Acciones</th>
@@ -159,7 +183,7 @@ export function CrudTable({ columns, rows, onSave, onDelete, formFields, emptyTe
                 </td>
               </tr>
             ) : (
-              rows.map((row) => (
+              sortedRows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50">
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3 text-gray-700">{row[col.key]}</td>
