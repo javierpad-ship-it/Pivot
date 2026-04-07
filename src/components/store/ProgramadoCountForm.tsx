@@ -46,7 +46,7 @@ export function ProgramadoCountForm(props: Props) {
       });
       if (!res.ok) throw new Error((await res.json()).error);
       setDone(true);
-      setTimeout(() => router.push(`/store/${props.storeId}`), 1500);
+      setTimeout(() => { window.location.href = `/store/${props.storeId}`; }, 1500);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error al guardar");
     } finally {
