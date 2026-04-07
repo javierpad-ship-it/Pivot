@@ -20,6 +20,22 @@ export function LineasClient({ lineas, mundos }: Props) {
   const [mundoId, setMundoId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<"mundo" | "name" | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  function handleSort(key: "mundo" | "name") {
+    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  }
+
+  const sortedData = sortKey
+    ? [...data].sort((a, b) => {
+        const va = sortKey === "mundo" ? a.mundo.name : a.name;
+        const vb = sortKey === "mundo" ? b.mundo.name : b.name;
+        const cmp = va.localeCompare(vb, "es", { sensitivity: "base" });
+        return sortDir === "asc" ? cmp : -cmp;
+      })
+    : data;
 
   function openAdd() {
     setEditId(null); setName(""); setMundoId(""); setError(null); setShowForm(true);
@@ -122,8 +138,19 @@ export function LineasClient({ lineas, mundos }: Props) {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Mundo</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Línea</th>
+              {(["mundo", "name"] as const).map((key) => (
+                <th key={key} className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <button
+                    onClick={() => handleSort(key)}
+                    className="inline-flex items-center gap-1 hover:text-gray-800 transition-colors"
+                  >
+                    {key === "mundo" ? "Mundo" : "Línea"}
+                    <span className="text-gray-300">
+                      {sortKey === key ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
+                    </span>
+                  </button>
+                </th>
+              ))}
               <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">Acciones</th>
             </tr>
           </thead>
@@ -131,7 +158,7 @@ export function LineasClient({ lineas, mundos }: Props) {
             {data.length === 0 ? (
               <tr><td colSpan={3} className="px-4 py-8 text-center text-gray-400 text-sm">No hay líneas registradas</td></tr>
             ) : (
-              data.map((l) => (
+              sortedData.map((l) => (
                 <tr key={l.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
