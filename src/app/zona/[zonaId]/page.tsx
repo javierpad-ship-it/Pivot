@@ -25,8 +25,8 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
   const [programados, contados] = await Promise.all([
     isScheduleDay
       ? prisma.programacion.findMany({
-          where: { storeId: { in: storeIds }, dayOfWeek: todayJs },
-          select: { storeId: true },
+          where: { dayOfWeek: todayJs },
+          select: { scope: true, tiendas: { select: { storeId: true } } },
         })
       : Promise.resolve([]),
     isScheduleDay
@@ -37,9 +37,15 @@ export default async function ZonaProgressPage({ params }: { params: { zonaId: s
       : Promise.resolve([]),
   ]);
 
+  // Count programmed items per store: ALL-scope items apply to every store
   const progByStore: Record<string, number> = {};
+  for (const p of programados) {
+    const targets = p.scope === "ALL"
+      ? storeIds
+      : p.tiendas.map((t) => t.storeId).filter((id) => storeIds.includes(id));
+    for (const sid of targets) progByStore[sid] = (progByStore[sid] ?? 0) + 1;
+  }
   const contByStore: Record<string, number> = {};
-  for (const p of programados) progByStore[p.storeId] = (progByStore[p.storeId] ?? 0) + 1;
   for (const c of contados) contByStore[c.storeId] = (contByStore[c.storeId] ?? 0) + 1;
 
   const storeStats = zona.stores.map((store) => {

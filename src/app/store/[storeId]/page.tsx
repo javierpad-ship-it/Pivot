@@ -43,7 +43,13 @@ export default async function StoreDashboard({ params }: Props) {
     }),
     isScheduleDay
       ? prisma.programacion.findMany({
-          where: { storeId: params.storeId, dayOfWeek: todayJs },
+          where: {
+            dayOfWeek: todayJs,
+            OR: [
+              { scope: "ALL" },
+              { scope: "SOME", tiendas: { some: { storeId: params.storeId } } },
+            ],
+          },
           include: { brand: true, linea: { include: { mundo: true } }, genero: true },
           orderBy: [{ brand: { name: "asc" } }],
         })
@@ -56,7 +62,13 @@ export default async function StoreDashboard({ params }: Props) {
       : Promise.resolve([]),
     isYesterdayScheduleDay
       ? prisma.programacion.findMany({
-          where: { storeId: params.storeId, dayOfWeek: yesterdayJs },
+          where: {
+            dayOfWeek: yesterdayJs,
+            OR: [
+              { scope: "ALL" },
+              { scope: "SOME", tiendas: { some: { storeId: params.storeId } } },
+            ],
+          },
           include: { brand: true, linea: { include: { mundo: true } }, genero: true },
           orderBy: [{ brand: { name: "asc" } }],
         })

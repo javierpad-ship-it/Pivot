@@ -1,10 +1,13 @@
+// SQLite schema for local development only
+// Production uses schema.prisma (PostgreSQL) with migration files
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Empresa {
@@ -160,7 +163,7 @@ model ConteoRegistro {
   brandId   String
   lineaId   String
   generoId  String
-  fecha     DateTime @db.Date
+  fecha     DateTime // SQLite: no @db.Date needed
   cantidad  Int
   empleado  String
   creadoEn  DateTime @default(now())
