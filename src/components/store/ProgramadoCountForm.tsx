@@ -91,12 +91,14 @@ export function ProgramadoCountForm(props: Props) {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Marca</p>
-            <p className="font-semibold text-gray-900">{props.brandName}</p>
+            <p className="font-semibold text-gray-900">
+              {props.brandId === "brand-all" ? "Todas las marcas" : props.brandName}
+            </p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Género</p>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-              {props.generoName}
+              {props.generoId === "genero-all" ? "Todos los géneros" : props.generoName}
             </span>
           </div>
           <div>

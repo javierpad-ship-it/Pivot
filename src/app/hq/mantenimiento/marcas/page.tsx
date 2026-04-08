@@ -4,7 +4,7 @@ import { MarcasClient } from "@/components/hq/maintenance/MarcasClient";
 export const dynamic = "force-dynamic";
 
 export default async function MarcasPage() {
-  const marcas = await prisma.brand.findMany({ orderBy: { name: "asc" } });
+  const marcas = await prisma.brand.findMany({ where: { id: { not: "brand-all" } }, orderBy: { name: "asc" } });
   return (
     <div className="p-8">
       <div className="mb-6">

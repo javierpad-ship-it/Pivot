@@ -112,9 +112,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
       });
       if (!res.ok) throw new Error((await res.json()).error);
       const created = await res.json();
-      // API returns an array (may be one or many when __ALL__ is used)
-      const newItems = Array.isArray(created) ? created : [created];
-      setItems((prev) => [...prev, ...newItems]);
+      setItems((prev) => [...prev, created]);
       setForm({ brandId: "__ALL__", mundoId: "", lineaId: "", generoId: "__ALL__" });
       setScope("ALL");
       setSelectedStores([]);
@@ -413,13 +411,17 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                 ) : (
                   filtered.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{item.brand.name}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">
+                        {item.brand.id === "brand-all"
+                          ? <span className="text-gray-500 italic">Todas las marcas</span>
+                          : item.brand.name}
+                      </td>
                       <td className="px-4 py-3 text-gray-700">
                         <span className="text-xs text-gray-400">{item.linea.mundo.name} /</span> {item.linea.name}
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {item.genero.name}
+                          {item.genero.id === "genero-all" ? "Todos los géneros" : item.genero.name}
                         </span>
                       </td>
                       <td className="px-4 py-3">

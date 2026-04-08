@@ -6,12 +6,12 @@ export const dynamic = "force-dynamic";
 export default async function ProgramacionPage() {
   const [stores, brands, lineas, generos, items] = await Promise.all([
     prisma.store.findMany({ orderBy: { name: "asc" } }),
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
+    prisma.brand.findMany({ where: { id: { not: "brand-all" } }, orderBy: { name: "asc" } }),
     prisma.linea.findMany({
       orderBy: [{ mundo: { name: "asc" } }, { name: "asc" }],
       include: { mundo: true },
     }),
-    prisma.genero.findMany({ orderBy: { name: "asc" } }),
+    prisma.genero.findMany({ where: { id: { not: "genero-all" } }, orderBy: { name: "asc" } }),
     prisma.programacion.findMany({
       include: {
         brand: true,

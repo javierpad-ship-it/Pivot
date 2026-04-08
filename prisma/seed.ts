@@ -3,6 +3,18 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Sentinel records — represent "TODOS" (all brands / all géneros) in schedules
+  await prisma.brand.upsert({
+    where: { id: "brand-all" },
+    update: {},
+    create: { id: "brand-all", name: "TODOS" },
+  });
+  await prisma.genero.upsert({
+    where: { id: "genero-all" },
+    update: {},
+    create: { id: "genero-all", name: "TODOS" },
+  });
+
   // Stores
   const stores = await Promise.all([
     prisma.store.upsert({

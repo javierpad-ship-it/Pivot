@@ -34,46 +34,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Debes seleccionar al menos una tienda" }, { status: 400 });
   }
 
-  // Resolve "__ALL__" wildcard values to actual IDs
-  const brandIds: string[] =
-    brandId === "__ALL__"
-      ? (await prisma.brand.findMany({ select: { id: true } })).map((b) => b.id)
-      : [brandId];
+  // Map __ALL__ wildcards to sentinel IDs — creates ONE task, not N individual tasks
+  const resolvedBrandId  = brandId  === "__ALL__" ? "brand-all"  : brandId;
+  const resolvedGeneroId = generoId === "__ALL__" ? "genero-all" : generoId;
 
-  const generoIds: string[] =
-    generoId === "__ALL__"
-      ? (await prisma.genero.findMany({ select: { id: true } })).map((g) => g.id)
-      : [generoId];
-
-  // Build all combinations (brand × genero) and create, skipping duplicates
-  const created: object[] = [];
-  for (const bId of brandIds) {
-    for (const gId of generoIds) {
-      try {
-        const item = await prisma.programacion.create({
-          data: {
-            dayOfWeek,
-            scope,
-            brandId: bId,
-            lineaId,
-            generoId: gId,
-            tiendas:
-              scope === "SOME"
-                ? { create: (storeIds as string[]).map((storeId: string) => ({ storeId })) }
-                : undefined,
-          },
-          include,
-        });
-        created.push(item);
-      } catch {
-        // skip duplicates silently
-      }
-    }
+  try {
+    const item = await prisma.programacion.create({
+      data: {
+        dayOfWeek,
+        scope,
+        brandId: resolvedBrandId,
+        lineaId,
+        generoId: resolvedGeneroId,
+        tiendas:
+          scope === "SOME"
+            ? { create: (storeIds as string[]).map((storeId: string) => ({ storeId })) }
+            : undefined,
+      },
+      include,
+    });
+    return NextResponse.json(item, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Ya existe esta combinación en ese día" }, { status: 409 });
   }
-
-  if (created.length === 0) {
-    return NextResponse.json({ error: "Ya existen todas estas combinaciones en ese día" }, { status: 409 });
-  }
-
-  return NextResponse.json(created, { status: 201 });
 }

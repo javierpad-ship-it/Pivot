@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function GenerosPage() {
   const generos = await prisma.genero.findMany({
+    where: { id: { not: "genero-all" } },
     orderBy: { name: "asc" },
     include: { _count: { select: { programaciones: true } } },
   });
