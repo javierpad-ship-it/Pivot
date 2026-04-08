@@ -39,9 +39,14 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
   const [tab, setTab] = useState<Tab>("lista");
   const [selectedDay, setSelectedDay] = useState(1);
 
+  // Derive unique mundos from lineas prop (no extra server fetch needed)
+  const mundos = Array.from(
+    new Map(lineas.map((l) => [l.mundo.id, l.mundo])).values()
+  ).sort((a, b) => a.name.localeCompare(b.name, "es"));
+
   // Add form state
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ brandId: "", lineaId: "", generoId: "" });
+  const [form, setForm] = useState({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
   const [scope, setScope] = useState<"ALL" | "SOME">("ALL");
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,8 +66,13 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
     );
   }
 
+  // Lines filtered by selected mundo
+  const lineasFiltradas = form.mundoId
+    ? lineas.filter((l) => l.mundo.id === form.mundoId)
+    : [];
+
   function openForm() {
-    setForm({ brandId: "", lineaId: "", generoId: "" });
+    setForm({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
     setScope("ALL");
     setSelectedStores([]);
     setError(null);
@@ -89,7 +99,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
       if (!res.ok) throw new Error((await res.json()).error);
       const created = await res.json();
       setItems((prev) => [...prev, created]);
-      setForm({ brandId: "", lineaId: "", generoId: "" });
+      setForm({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
       setScope("ALL");
       setSelectedStores([]);
       setShowForm(false);
@@ -176,8 +186,8 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                 Nuevo ítem — {DAYS.find((d) => d.value === selectedDay)?.label}
               </p>
 
-              {/* Brand / Linea / Genero */}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {/* Marca / Mundo / Línea / Género — cascading 2×2 grid */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Marca</label>
                   <select
@@ -191,16 +201,29 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-gray-600">Línea (Mundo)</label>
+                  <label className="text-xs font-medium text-gray-600">Mundo</label>
                   <select
-                    value={form.lineaId}
-                    onChange={(e) => setForm((f) => ({ ...f, lineaId: e.target.value }))}
+                    value={form.mundoId}
+                    onChange={(e) => setForm((f) => ({ ...f, mundoId: e.target.value, lineaId: "" }))}
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Seleccionar…</option>
-                    {lineas.map((l) => (
-                      <option key={l.id} value={l.id}>{l.mundo.name} / {l.name}</option>
+                    {mundos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-gray-600">Línea</label>
+                  <select
+                    value={form.lineaId}
+                    onChange={(e) => setForm((f) => ({ ...f, lineaId: e.target.value }))}
+                    required
+                    disabled={!form.mundoId}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
+                  >
+                    <option value="">{form.mundoId ? "Seleccionar…" : "Primero selecciona un mundo"}</option>
+                    {lineasFiltradas.map((l) => (
+                      <option key={l.id} value={l.id}>{l.name}</option>
                     ))}
                   </select>
                 </div>
