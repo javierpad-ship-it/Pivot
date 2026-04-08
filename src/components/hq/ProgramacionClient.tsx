@@ -52,7 +52,20 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filtered = items.filter((i) => i.dayOfWeek === selectedDay);
+  // Filter state for the list view
+  const [filterMundoId, setFilterMundoId] = useState("");
+  const [filterLineaId, setFilterLineaId] = useState("");
+
+  const lineasFiltroOpciones = filterMundoId
+    ? lineas.filter((l) => l.mundo.id === filterMundoId)
+    : lineas;
+
+  const filtered = items.filter((i) => {
+    if (i.dayOfWeek !== selectedDay) return false;
+    if (filterMundoId && i.linea.mundo.id !== filterMundoId) return false;
+    if (filterLineaId && i.linea.id !== filterLineaId) return false;
+    return true;
+  });
 
   function toggleStore(id: string) {
     setSelectedStores((prev) =>
@@ -177,6 +190,43 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
               </svg>
               Agregar ítem
             </button>
+          </div>
+
+          {/* Mundo / Línea filter bar */}
+          <div className="flex flex-wrap gap-2 items-end">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Mundo</label>
+              <select
+                value={filterMundoId}
+                onChange={(e) => { setFilterMundoId(e.target.value); setFilterLineaId(""); }}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[150px]"
+              >
+                <option value="">Todos los mundos</option>
+                {mundos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Línea</label>
+              <select
+                value={filterLineaId}
+                onChange={(e) => setFilterLineaId(e.target.value)}
+                disabled={!filterMundoId}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px] disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">Todas las líneas</option>
+                {lineasFiltroOpciones.map((l) => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+            </div>
+            {(filterMundoId || filterLineaId) && (
+              <button
+                onClick={() => { setFilterMundoId(""); setFilterLineaId(""); }}
+                className="px-2 py-1.5 text-xs text-gray-500 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Limpiar filtros
+              </button>
+            )}
           </div>
 
           {/* Add form */}
