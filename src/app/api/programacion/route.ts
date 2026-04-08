@@ -54,7 +54,17 @@ export async function POST(req: NextRequest) {
       include,
     });
     return NextResponse.json(item, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Ya existe esta combinación en ese día" }, { status: 409 });
+  } catch (err: unknown) {
+    // Prisma P2002 = unique constraint violation (duplicate schedule)
+    // Prisma P2003 = foreign key constraint (invalid brand/linea/genero ID)
+    const code = (err as { code?: string })?.code;
+    if (code === "P2002") {
+      return NextResponse.json({ error: "Ya existe esta combinación en ese día" }, { status: 409 });
+    }
+    if (code === "P2003") {
+      return NextResponse.json({ error: "Datos inválidos: recarga la página e intenta de nuevo" }, { status: 400 });
+    }
+    console.error("[POST /api/programacion]", err);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
