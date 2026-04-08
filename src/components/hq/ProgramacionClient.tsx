@@ -111,7 +111,9 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
       });
       if (!res.ok) throw new Error((await res.json()).error);
       const created = await res.json();
-      setItems((prev) => [...prev, created]);
+      // API returns an array (may be one or many when __ALL__ is used)
+      const newItems = Array.isArray(created) ? created : [created];
+      setItems((prev) => [...prev, ...newItems]);
       setForm({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
       setScope("ALL");
       setSelectedStores([]);
@@ -236,8 +238,9 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                 Nuevo ítem — {DAYS.find((d) => d.value === selectedDay)?.label}
               </p>
 
-              {/* Marca / Mundo / Línea / Género — cascading 2×2 grid */}
+              {/* Marca / Mundo(nav) / Línea / Género — 2×2 grid */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {/* Marca — can be "Todas" */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Marca</label>
                   <select
@@ -247,36 +250,49 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Seleccionar…</option>
+                    <option value="__ALL__">— Todas las marcas —</option>
                     {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
                 </div>
+
+                {/* Mundo — optional navigation filter for Línea */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-gray-600">Mundo</label>
+                  <label className="text-xs font-medium text-gray-600">Mundo <span className="text-gray-400 font-normal">(filtro)</span></label>
                   <select
                     value={form.mundoId}
                     onChange={(e) => setForm((f) => ({ ...f, mundoId: e.target.value, lineaId: "" }))}
-                    required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Seleccionar…</option>
+                    <option value="">Todos los mundos</option>
                     {mundos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                   </select>
                 </div>
+
+                {/* Línea — filtered by Mundo if selected, always enabled */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Línea</label>
                   <select
                     value={form.lineaId}
                     onChange={(e) => setForm((f) => ({ ...f, lineaId: e.target.value }))}
                     required
-                    disabled={!form.mundoId}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-400"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">{form.mundoId ? "Seleccionar…" : "Primero selecciona un mundo"}</option>
-                    {lineasFiltradas.map((l) => (
-                      <option key={l.id} value={l.id}>{l.name}</option>
-                    ))}
+                    <option value="">Seleccionar…</option>
+                    {form.mundoId
+                      ? lineasFiltradas.map((l) => (
+                          <option key={l.id} value={l.id}>{l.name}</option>
+                        ))
+                      : mundos.map((m) => (
+                          <optgroup key={m.id} label={m.name}>
+                            {lineas.filter((l) => l.mundo.id === m.id).map((l) => (
+                              <option key={l.id} value={l.id}>{l.name}</option>
+                            ))}
+                          </optgroup>
+                        ))}
                   </select>
                 </div>
+
+                {/* Género — can be "Todos" */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Género</label>
                   <select
@@ -286,6 +302,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Seleccionar…</option>
+                    <option value="__ALL__">— Todos los géneros —</option>
                     {generos.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
                   </select>
                 </div>
