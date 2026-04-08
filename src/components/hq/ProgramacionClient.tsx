@@ -85,7 +85,8 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
     : [];
 
   function openForm() {
-    setForm({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
+    // Default to TODOS for Marca and Género; Línea must be chosen explicitly
+    setForm({ brandId: "__ALL__", mundoId: "", lineaId: "", generoId: "__ALL__" });
     setScope("ALL");
     setSelectedStores([]);
     setError(null);
@@ -114,7 +115,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
       // API returns an array (may be one or many when __ALL__ is used)
       const newItems = Array.isArray(created) ? created : [created];
       setItems((prev) => [...prev, ...newItems]);
-      setForm({ brandId: "", mundoId: "", lineaId: "", generoId: "" });
+      setForm({ brandId: "__ALL__", mundoId: "", lineaId: "", generoId: "__ALL__" });
       setScope("ALL");
       setSelectedStores([]);
       setShowForm(false);
@@ -240,7 +241,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
 
               {/* Marca / Mundo(nav) / Línea / Género — 2×2 grid */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {/* Marca — can be "Todas" */}
+                {/* Marca — TODOS first */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Marca</label>
                   <select
@@ -249,13 +250,12 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Seleccionar…</option>
-                    <option value="__ALL__">— Todas las marcas —</option>
+                    <option value="__ALL__">TODOS</option>
                     {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
                 </div>
 
-                {/* Mundo — optional navigation filter for Línea */}
+                {/* Mundo — optional nav filter, TODOS first */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Mundo <span className="text-gray-400 font-normal">(filtro)</span></label>
                   <select
@@ -263,12 +263,12 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     onChange={(e) => setForm((f) => ({ ...f, mundoId: e.target.value, lineaId: "" }))}
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Todos los mundos</option>
+                    <option value="">TODOS</option>
                     {mundos.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                   </select>
                 </div>
 
-                {/* Línea — filtered by Mundo if selected, always enabled */}
+                {/* Línea — always enabled; grouped by mundo when no mundo selected */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Línea</label>
                   <select
@@ -277,7 +277,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Seleccionar…</option>
+                    <option value="">Seleccionar línea…</option>
                     {form.mundoId
                       ? lineasFiltradas.map((l) => (
                           <option key={l.id} value={l.id}>{l.name}</option>
@@ -292,7 +292,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                   </select>
                 </div>
 
-                {/* Género — can be "Todos" */}
+                {/* Género — TODOS first */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-gray-600">Género</label>
                   <select
@@ -301,8 +301,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
                     required
                     className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Seleccionar…</option>
-                    <option value="__ALL__">— Todos los géneros —</option>
+                    <option value="__ALL__">TODOS</option>
                     {generos.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
                   </select>
                 </div>
