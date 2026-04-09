@@ -38,14 +38,6 @@ export async function POST(req: NextRequest) {
   const resolvedBrandId  = brandId  === "__ALL__" ? "brand-all"  : brandId;
   const resolvedGeneroId = generoId === "__ALL__" ? "genero-all" : generoId;
 
-  // Debug: log what we're about to insert + current state
-  const existing = await prisma.programacion.findMany({
-    where: { dayOfWeek },
-    select: { id: true, dayOfWeek: true, brandId: true, lineaId: true, generoId: true },
-  });
-  console.log("[POST /api/programacion] inserting:", { dayOfWeek, resolvedBrandId, lineaId, resolvedGeneroId, scope });
-  console.log("[POST /api/programacion] existing records for day", dayOfWeek, ":", JSON.stringify(existing));
-
   try {
     const item = await prisma.programacion.create({
       data: {
@@ -66,7 +58,7 @@ export async function POST(req: NextRequest) {
     // Prisma P2002 = unique constraint violation (duplicate schedule)
     // Prisma P2003 = foreign key constraint (invalid brand/linea/genero ID)
     const code = (err as { code?: string })?.code;
-    console.error("[POST /api/programacion] error code:", code, err);
+    if (code !== "P2002" && code !== "P2003") console.error("[POST /api/programacion]", err);
     if (code === "P2002") {
       return NextResponse.json({ error: "Ya existe esta combinación en ese día" }, { status: 409 });
     }
