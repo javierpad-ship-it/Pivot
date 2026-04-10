@@ -25,17 +25,23 @@ function LoginForm() {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await res.json();
+      let data: { error?: string; redirectTo?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        setError(`Error del servidor (${res.status}). Revisa los logs.`);
+        return;
+      }
 
       if (!res.ok) {
         setError(data.error ?? "Error al iniciar sesión");
         return;
       }
 
-      const destination = next && next.startsWith("/") ? next : data.redirectTo;
+      const destination = next && next.startsWith("/") ? next : data.redirectTo ?? "/";
       window.location.href = destination;
     } catch {
-      setError("Error de conexión. Intenta de nuevo.");
+      setError("Error de red. Verifica tu conexión e intenta de nuevo.");
     } finally {
       setLoading(false);
     }
