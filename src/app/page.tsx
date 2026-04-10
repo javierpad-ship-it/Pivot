@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/session-server";
 
-export default async function Home() {
-  const user = await getSession();
+export const dynamic = "force-dynamic";
+
+export default function Home() {
+  const user = getSession();
 
   if (!user) redirect("/login");
 

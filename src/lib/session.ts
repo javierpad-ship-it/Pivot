@@ -1,5 +1,4 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 export type SessionUser = {
@@ -12,7 +11,7 @@ export type SessionUser = {
 };
 
 const SECRET = process.env.SESSION_SECRET ?? "dev-secret-change-in-prod";
-const COOKIE = "session";
+export const COOKIE_NAME = "session";
 
 export function signSession(user: SessionUser): string {
   const payload = Buffer.from(JSON.stringify(user)).toString("base64url");
@@ -31,22 +30,15 @@ export function verifySession(value: string): SessionUser | null {
   } catch {
     return null;
   }
-  return JSON.parse(Buffer.from(payload, "base64url").toString()) as SessionUser;
-}
-
-// For Server Components and Route Handlers (cookies() is sync in Next.js 14)
-export function getSession(): SessionUser | null {
   try {
-    const c = cookies().get(COOKIE);
-    return c ? verifySession(c.value) : null;
+    return JSON.parse(Buffer.from(payload, "base64url").toString()) as SessionUser;
   } catch {
     return null;
   }
 }
 
+// For middleware (Edge Runtime) — uses NextRequest, not next/headers
 export function getSessionFromRequest(req: NextRequest): SessionUser | null {
-  const c = req.cookies.get(COOKIE);
+  const c = req.cookies.get(COOKIE_NAME);
   return c ? verifySession(c.value) : null;
 }
-
-export const COOKIE_NAME = COOKIE;

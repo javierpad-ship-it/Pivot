@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/session-server";
 import { HQShell } from "@/components/hq/HQShell";
 
 export const dynamic = "force-dynamic";
