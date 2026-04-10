@@ -2,12 +2,6 @@
 
 import { useState } from "react";
 
-const DAYS = [
-  { value: 1, label: "Lunes", short: "L" },
-  { value: 2, label: "Martes", short: "M" },
-  { value: 3, label: "Miércoles", short: "Mi" },
-  { value: 4, label: "Jueves", short: "J" },
-];
 
 interface Store { id: string; name: string; distrito: string; ciudad: string }
 interface Brand { id: string; name: string }
@@ -24,7 +18,10 @@ interface ProgramItem {
   tiendas: { storeId: string; store: Store }[];
 }
 
+interface Day { value: number; label: string; short: string }
+
 interface Props {
+  days: Day[];
   stores: Store[];
   brands: Brand[];
   lineas: Linea[];
@@ -34,10 +31,10 @@ interface Props {
 
 type Tab = "lista" | "matriz";
 
-export function ProgramacionClient({ stores, brands, lineas, generos, initialItems }: Props) {
+export function ProgramacionClient({ days, stores, brands, lineas, generos, initialItems }: Props) {
   const [items, setItems] = useState(initialItems);
   const [tab, setTab] = useState<Tab>("lista");
-  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedDay, setSelectedDay] = useState(days[0]?.value ?? 1);
 
   // Derive unique mundos from lineas prop (no extra server fetch needed)
   const mundos = Array.from(
@@ -137,7 +134,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Día</label>
           <div className="flex gap-1">
-            {DAYS.map((d) => (
+            {days.map((d) => (
               <button
                 key={d.value}
                 onClick={() => setSelectedDay(d.value)}
@@ -179,7 +176,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-gray-700">
-              {DAYS.find((d) => d.value === selectedDay)?.label}
+              {days.find((d) => d.value === selectedDay)?.label}
               <span className="ml-2 text-gray-400">({filtered.length} ítems)</span>
             </p>
             <button
@@ -234,7 +231,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
           {showForm && (
             <form onSubmit={handleAdd} className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-4">
               <p className="text-sm font-medium text-blue-800">
-                Nuevo ítem — {DAYS.find((d) => d.value === selectedDay)?.label}
+                Nuevo ítem — {days.find((d) => d.value === selectedDay)?.label}
               </p>
 
               {/* Marca / Mundo(nav) / Línea / Género — 2×2 grid */}
@@ -457,7 +454,7 @@ export function ProgramacionClient({ stores, brands, lineas, generos, initialIte
 
       {/* ---- MATRIX VIEW ---- */}
       {tab === "matriz" && (
-        <MatrizView items={filtered} stores={stores} dayLabel={DAYS.find((d) => d.value === selectedDay)?.label ?? ""} />
+        <MatrizView items={filtered} stores={stores} dayLabel={days.find((d) => d.value === selectedDay)?.label ?? ""} />
       )}
     </div>
   );

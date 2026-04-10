@@ -3,6 +3,24 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Días habilitados para conteos (1=Lunes … 7=Domingo)
+  const diasDefs = [
+    { dayOfWeek: 1, name: "Lunes",     enabled: true  },
+    { dayOfWeek: 2, name: "Martes",    enabled: true  },
+    { dayOfWeek: 3, name: "Miércoles", enabled: true  },
+    { dayOfWeek: 4, name: "Jueves",    enabled: true  },
+    { dayOfWeek: 5, name: "Viernes",   enabled: false },
+    { dayOfWeek: 6, name: "Sábado",    enabled: false },
+    { dayOfWeek: 7, name: "Domingo",   enabled: false },
+  ];
+  for (const d of diasDefs) {
+    await prisma.configDia.upsert({
+      where: { dayOfWeek: d.dayOfWeek },
+      update: {},
+      create: d,
+    });
+  }
+
   // Sentinel records — represent "TODOS" (all brands / all géneros) in schedules
   await prisma.brand.upsert({
     where: { id: "brand-all" },

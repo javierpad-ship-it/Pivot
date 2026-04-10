@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
   if (!dayOfWeek || !brandId || !lineaId || !generoId || !scope) {
     return NextResponse.json({ error: "Todos los campos son requeridos" }, { status: 400 });
   }
-  if (dayOfWeek < 1 || dayOfWeek > 4) {
-    return NextResponse.json({ error: "Día debe ser entre 1 (Lunes) y 4 (Jueves)" }, { status: 400 });
+  const configDia = await prisma.configDia.findUnique({ where: { dayOfWeek } });
+  if (!configDia?.enabled) {
+    return NextResponse.json({ error: "Ese día no está habilitado para conteos" }, { status: 400 });
   }
   if (scope === "SOME" && (!storeIds || storeIds.length === 0)) {
     return NextResponse.json({ error: "Debes seleccionar al menos una tienda" }, { status: 400 });

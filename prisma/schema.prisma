@@ -172,3 +172,9 @@ model ConteoRegistro {
 
   @@unique([storeId, brandId, lineaId, generoId, fecha])
 }
+
+model ConfigDia {
+  dayOfWeek Int     @id  // 1=Lunes … 7=Domingo
+  name      String
+  enabled   Boolean @default(false)
+}

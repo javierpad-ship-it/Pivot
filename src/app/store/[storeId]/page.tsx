@@ -14,15 +14,22 @@ export default async function StoreDashboard({ params }: Props) {
   if (!store) notFound();
 
   const today = new Date();
-  const todayJs = today.getDay();
+  const todayJs = today.getDay();                        // JS: 0=Sun, 1=Mon..6=Sat
+  const todayDow = todayJs === 0 ? 7 : todayJs;         // our system: 1=Mon..7=Sun
   const todayStr = today.toISOString().split("T")[0];
-  const isScheduleDay = todayJs >= 1 && todayJs <= 4;
 
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayJs = yesterday.getDay();
+  const yesterdayDow = yesterdayJs === 0 ? 7 : yesterdayJs;
   const yesterdayStr = yesterday.toISOString().split("T")[0];
-  const isYesterdayScheduleDay = yesterdayJs >= 1 && yesterdayJs <= 4;
+
+  const [enabledDias] = await Promise.all([
+    prisma.configDia.findMany({ where: { enabled: true }, select: { dayOfWeek: true } }),
+  ]);
+  const enabledSet = new Set(enabledDias.map((d) => d.dayOfWeek));
+  const isScheduleDay = enabledSet.has(todayDow);
+  const isYesterdayScheduleDay = enabledSet.has(yesterdayDow);
 
   // Start of today (UTC) for filtering completed individual tasks
   const todayStart = new Date(today);
@@ -44,7 +51,7 @@ export default async function StoreDashboard({ params }: Props) {
     isScheduleDay
       ? prisma.programacion.findMany({
           where: {
-            dayOfWeek: todayJs,
+            dayOfWeek: todayDow,
             OR: [
               { scope: "ALL" },
               { scope: "SOME", tiendas: { some: { storeId: params.storeId } } },
@@ -63,7 +70,7 @@ export default async function StoreDashboard({ params }: Props) {
     isYesterdayScheduleDay
       ? prisma.programacion.findMany({
           where: {
-            dayOfWeek: yesterdayJs,
+            dayOfWeek: yesterdayDow,
             OR: [
               { scope: "ALL" },
               { scope: "SOME", tiendas: { some: { storeId: params.storeId } } },
