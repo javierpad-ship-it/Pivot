@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { HQShell } from "@/components/hq/HQShell";
 
+export const dynamic = "force-dynamic";
+
 export default async function HQLayout({ children }: { children: React.ReactNode }) {
-  const user = await getSession();
+  const user = getSession();
   if (!user) redirect("/login");
 
   const hqRoles = ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR"];

@@ -34,9 +34,14 @@ export function verifySession(value: string): SessionUser | null {
   return JSON.parse(Buffer.from(payload, "base64url").toString()) as SessionUser;
 }
 
-export async function getSession(): Promise<SessionUser | null> {
-  const c = (await cookies()).get(COOKIE);
-  return c ? verifySession(c.value) : null;
+// For Server Components and Route Handlers (cookies() is sync in Next.js 14)
+export function getSession(): SessionUser | null {
+  try {
+    const c = cookies().get(COOKIE);
+    return c ? verifySession(c.value) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function getSessionFromRequest(req: NextRequest): SessionUser | null {
