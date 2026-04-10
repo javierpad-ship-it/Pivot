@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { hashSync } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -157,7 +158,52 @@ async function main() {
     }
   }
 
-  console.log("Seed completo: 6 tiendas, 5 marcas, 4 mundos, 8 líneas, 12 tareas.");
+  // Zonas
+  const zonaSur = await prisma.zona.upsert({
+    where: { name: "Zona Sur Oriente" },
+    update: {},
+    create: { id: "zona-sur-oriente", name: "Zona Sur Oriente" },
+  });
+  const zonaCentro = await prisma.zona.upsert({
+    where: { name: "Zona Centro Norte" },
+    update: {},
+    create: { id: "zona-centro-norte", name: "Zona Centro Norte" },
+  });
+
+  // Usuarios
+  const pw1234   = hashSync("1234",   10);
+  const pw220922 = hashSync("220922", 10);
+
+  const usuariosDefs = [
+    { id: "usr-jperezalbela", nombre: "J. Pérez Albela",  username: "jperezalbela", password: pw220922, rol: "SUPER_ADMIN",    storeId: null, zonaId: null           },
+    { id: "usr-cpelaez",      nombre: "C. Peláez",        username: "cpelaez",      password: pw1234,   rol: "ADMIN",          storeId: null, zonaId: null           },
+    { id: "usr-admventas",    nombre: "Adm. Ventas",      username: "admventas",    password: pw1234,   rol: "PROGRAMADOR",    storeId: null, zonaId: null           },
+    { id: "usr-jbarraga",     nombre: "J. Barraga",       username: "jbarraga",     password: pw1234,   rol: "GERENTE_ZONAL",  storeId: null, zonaId: zonaSur.id     },
+    { id: "usr-mvasquez",     nombre: "M. Vásquez",       username: "mvasquez",     password: pw1234,   rol: "GERENTE_ZONAL",  storeId: null, zonaId: zonaCentro.id  },
+  ];
+
+  for (const u of usuariosDefs) {
+    await prisma.usuario.upsert({
+      where: { username: u.username },
+      update: {},
+      create: u,
+    });
+  }
+
+  // Store users (one per store, username = slugified store name)
+  const allStores = await prisma.store.findMany();
+  for (const s of allStores) {
+    const slug = s.name.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "").replace(/[^a-z0-9]/g, "");
+    await prisma.usuario.upsert({
+      where: { username: slug },
+      update: {},
+      create: { nombre: s.name, username: slug, password: pw1234, rol: "TIENDA", storeId: s.id },
+    });
+  }
+
+  console.log("Seed completo: 6 tiendas, 5 marcas, 4 mundos, 8 líneas, 12 tareas, usuarios.");
 }
 
 main()
