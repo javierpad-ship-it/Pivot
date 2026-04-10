@@ -1,26 +1,54 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSessionFromRequest, SessionUser } from "@/lib/session";
 
-function redirectByRole(user: SessionUser, req: NextRequest): NextResponse {
+const COOKIE = "session";
+
+// Decode the cookie payload WITHOUT HMAC verification (Edge Runtime safe).
+// Full cryptographic verification is done in Server Components (Node.js runtime).
+// This is safe because the worst a forged cookie can do is trick routing;
+// the Server Component will redirect the user away immediately.
+function parseSessionCookie(req: NextRequest): {
+  rol: string;
+  storeId: string | null;
+  zonaId: string | null;
+} | null {
+  const c = req.cookies.get(COOKIE);
+  if (!c) return null;
+  try {
+    const dot = c.value.lastIndexOf(".");
+    if (dot === -1) return null;
+    const payload = c.value.slice(0, dot);
+    // base64url → base64 → JSON
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function redirectByRole(
+  user: { rol: string; storeId: string | null; zonaId: string | null },
+  req: NextRequest
+): NextResponse {
   const base = new URL(req.url).origin;
   if (user.rol === "TIENDA") return NextResponse.redirect(`${base}/store/${user.storeId}`);
   if (user.rol === "GERENTE_ZONAL") return NextResponse.redirect(`${base}/zona/${user.zonaId}`);
   if (user.rol === "PROGRAMADOR") return NextResponse.redirect(`${base}/hq/programacion`);
-  return NextResponse.redirect(`${base}/hq`); // SUPER_ADMIN, ADMIN
+  return NextResponse.redirect(`${base}/hq`);
 }
 
 export function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
-  const user = getSessionFromRequest(req);
+  const user = parseSessionCookie(req);
 
-  // Public: /login, /api/auth/*
+  // Public paths — no auth needed
   if (pathname === "/login" || pathname.startsWith("/api/auth/")) {
     if (pathname === "/login" && user) return redirectByRole(user, req);
     return NextResponse.next();
   }
 
-  // Root: redirect to login or to role home
+  // Root redirect
   if (pathname === "/") {
     return user
       ? redirectByRole(user, req)
@@ -38,22 +66,14 @@ export function middleware(req: NextRequest): NextResponse {
   if (pathname.startsWith("/hq")) {
     const hqRoles = ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR"];
     if (!hqRoles.includes(user.rol)) return redirectByRole(user, req);
-
-    // Restrict PROGRAMADOR to dashboard, programacion, reports
     if (user.rol === "PROGRAMADOR") {
       const allowed = ["/hq", "/hq/programacion", "/hq/reports"];
       const ok = allowed.some((p) => pathname === p || pathname.startsWith(p + "/"));
       if (!ok) return NextResponse.redirect(new URL("/hq/programacion", req.url));
     }
-
-    // Usuarios page: SUPER_ADMIN only
-    if (
-      pathname.startsWith("/hq/mantenimiento/usuarios") &&
-      user.rol !== "SUPER_ADMIN"
-    ) {
+    if (pathname.startsWith("/hq/mantenimiento/usuarios") && user.rol !== "SUPER_ADMIN") {
       return NextResponse.redirect(new URL("/hq/mantenimiento", req.url));
     }
-
     return NextResponse.next();
   }
 
@@ -61,8 +81,8 @@ export function middleware(req: NextRequest): NextResponse {
   if (pathname.startsWith("/zona")) {
     if (!["SUPER_ADMIN", "GERENTE_ZONAL"].includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "GERENTE_ZONAL") {
-      const zoneMatch = pathname.match(/^\/zona\/([^/]+)/);
-      if (zoneMatch && zoneMatch[1] !== user.zonaId) {
+      const m = pathname.match(/^\/zona\/([^/]+)/);
+      if (m && m[1] !== user.zonaId) {
         return NextResponse.redirect(new URL(`/zona/${user.zonaId}`, req.url));
       }
     }
@@ -73,8 +93,8 @@ export function middleware(req: NextRequest): NextResponse {
   if (pathname.startsWith("/store")) {
     if (!["SUPER_ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "TIENDA") {
-      const storeMatch = pathname.match(/^\/store\/([^/]+)/);
-      if (storeMatch && storeMatch[1] !== user.storeId) {
+      const m = pathname.match(/^\/store\/([^/]+)/);
+      if (m && m[1] !== user.storeId) {
         return NextResponse.redirect(new URL(`/store/${user.storeId}`, req.url));
       }
     }
