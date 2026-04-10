@@ -13,7 +13,8 @@ function roleRedirect(user: SessionUser): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, password } = body as { username?: string; password?: string };
+    const { username: rawUsername, password } = body as { username?: string; password?: string };
+    const username = rawUsername?.trim().toLowerCase();
 
     if (!username || !password) {
       return NextResponse.json({ error: "Faltan credenciales" }, { status: 400 });
