@@ -57,7 +57,7 @@ function LoginForm() {
             alt="Lukers"
             className="h-14 mx-auto mb-5 object-contain"
           />
-          <h1 className="text-xl font-bold text-gray-900">Konteo</h1>
+          <h1 className="text-xl font-bold text-gray-900">Pivot Store</h1>
           <p className="text-gray-500 mt-1 text-sm">Ingresa tus credenciales para continuar</p>
         </div>
 
