@@ -51,13 +51,13 @@ function LoginForm() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-sm w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Konteo</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://rematefabrica.vteximg.com.br/arquivos/logo325x117.png?v=638617958543700000"
+            alt="Lukers"
+            className="h-14 mx-auto mb-5 object-contain"
+          />
+          <h1 className="text-xl font-bold text-gray-900">Konteo</h1>
           <p className="text-gray-500 mt-1 text-sm">Ingresa tus credenciales para continuar</p>
         </div>
 

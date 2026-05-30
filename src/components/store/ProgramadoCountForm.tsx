@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ScanCounter } from "./ScanCounter";
 
 interface Props {
   storeId: string;
@@ -18,17 +19,33 @@ interface Props {
   existingEmpleado: string | null;
 }
 
+type Mode = "manual" | "scan";
+
 export function ProgramadoCountForm(props: Props) {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("manual");
   const [cantidad, setCantidad] = useState(props.existingCantidad?.toString() ?? "");
+  const [scanCount, setScanCount] = useState(props.existingCantidad ?? 0);
   const [empleado, setEmpleado] = useState(props.existingEmpleado ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const finalCantidad = mode === "scan" ? scanCount : parseInt(cantidad);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (isNaN(finalCantidad) || finalCantidad < 0) {
+      setError("Ingresa una cantidad válida (0 o más).");
+      return;
+    }
+    if (!empleado.trim()) {
+      setError("Ingresa el nombre del empleado.");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/conteo-registro", {
@@ -40,7 +57,7 @@ export function ProgramadoCountForm(props: Props) {
           lineaId: props.lineaId,
           generoId: props.generoId,
           fecha: props.fecha,
-          cantidad: parseInt(cantidad),
+          cantidad: finalCantidad,
           empleado: empleado.trim(),
         }),
       });
@@ -118,19 +135,58 @@ export function ProgramadoCountForm(props: Props) {
         </div>
       )}
 
+      {/* Mode toggle */}
+      <div className="flex bg-gray-100 rounded-xl p-1 mb-5">
+        <button
+          type="button"
+          onClick={() => setMode("manual")}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+            mode === "manual"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Manual
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("scan")}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
+            mode === "scan"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8H2a2 2 0 00-2 2v10a2 2 0 002 2h3m3-6H3" />
+          </svg>
+          Escáner
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad contada</label>
-          <input
-            type="number"
-            min="0"
-            value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
-            required
-            placeholder="0"
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        {mode === "manual" ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad contada</label>
+            <input
+              type="number"
+              min="0"
+              value={cantidad}
+              onChange={(e) => setCantidad(e.target.value)}
+              required
+              placeholder="0"
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        ) : (
+          <ScanCounter count={scanCount} onChange={setScanCount} />
+        )}
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del empleado</label>
           <input
@@ -142,15 +198,26 @@ export function ProgramadoCountForm(props: Props) {
             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {mode === "scan" && scanCount > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800 flex items-center gap-2">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Se guardará un total de <strong className="ml-1">{scanCount} unidades</strong>
+          </div>
+        )}
+
         {error && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>
         )}
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (mode === "scan" && scanCount === 0)}
           className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {loading ? "Guardando…" : "Guardar Conteo"}
+          {loading ? "Guardando…" : `Guardar Conteo${mode === "scan" ? ` (${scanCount} uds.)` : ""}`}
         </button>
       </form>
     </div>
