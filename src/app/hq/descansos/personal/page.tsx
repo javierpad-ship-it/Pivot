@@ -45,7 +45,7 @@ export default async function PersonalPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Código / DNI</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Código</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tienda base</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Roles</th>
                 <th className="px-4 py-3"></th>
@@ -62,8 +62,6 @@ export default async function PersonalPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500">
                     <span className="font-mono text-xs">{p.codigo}</span>
-                    <span className="mx-1 text-gray-300">·</span>
-                    <span className="text-xs">{p.dni}</span>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{p.tiendaBase?.name ?? <span className="text-gray-300">—</span>}</td>
                   <td className="px-4 py-3">

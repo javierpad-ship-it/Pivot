@@ -221,7 +221,6 @@ model Usuario {
 model Persona {
   id             String   @id @default(cuid())
   codigo         String   @unique
-  dni            String   @unique
   nombreCompleto String
   tiendaBaseId   String?
   activo         Boolean  @default(true)

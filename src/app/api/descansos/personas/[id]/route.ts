@@ -3,11 +3,11 @@ import { prisma } from "@/lib/prisma";
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { codigo, dni, nombreCompleto, tiendaBaseId, activo, roles, elegibilidades } = await req.json();
+    const { codigo, nombreCompleto, tiendaBaseId, activo, roles, elegibilidades } = await req.json();
     const persona = await prisma.$transaction(async (tx) => {
       const p = await tx.persona.update({
         where: { id: params.id },
-        data: { codigo: codigo.trim(), dni: dni.trim(), nombreCompleto: nombreCompleto.trim(), tiendaBaseId: tiendaBaseId || null, activo },
+        data: { codigo: codigo.trim(), nombreCompleto: nombreCompleto.trim(), tiendaBaseId: tiendaBaseId || null, activo },
       });
       await tx.rolPersona.deleteMany({ where: { personaId: params.id } });
       if (roles?.length) {

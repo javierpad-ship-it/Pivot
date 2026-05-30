@@ -9,7 +9,6 @@ interface Store { id: string; name: string }
 interface PersonaData {
   id: string;
   codigo: string;
-  dni: string;
   nombreCompleto: string;
   tiendaBaseId: string | null;
   activo: boolean;
@@ -26,7 +25,6 @@ export function PersonaForm({ persona, stores }: Props) {
   const router = useRouter();
   const [form, setForm] = useState({
     codigo: persona?.codigo ?? "",
-    dni: persona?.dni ?? "",
     nombreCompleto: persona?.nombreCompleto ?? "",
     tiendaBaseId: persona?.tiendaBaseId ?? "",
     activo: persona?.activo ?? true,
@@ -72,19 +70,11 @@ export function PersonaForm({ persona, stores }: Props) {
       <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
         <h2 className="text-sm font-semibold text-gray-700">Datos del colaborador</h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Código *</label>
-            <input required value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="EJ001" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">DNI *</label>
-            <input required value={form.dni} onChange={(e) => setForm({ ...form, dni: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="12345678" />
-          </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Código de empleado *</label>
+          <input required value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="EJ001" />
         </div>
 
         <div>

@@ -11,13 +11,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { codigo, dni, nombreCompleto, tiendaBaseId, activo, roles, elegibilidades } = await req.json();
-    if (!codigo || !dni || !nombreCompleto) {
-      return NextResponse.json({ error: "Código, DNI y nombre son obligatorios" }, { status: 400 });
+    const { codigo, nombreCompleto, tiendaBaseId, activo, roles, elegibilidades } = await req.json();
+    if (!codigo || !nombreCompleto) {
+      return NextResponse.json({ error: "Código y nombre son obligatorios" }, { status: 400 });
     }
     const persona = await prisma.$transaction(async (tx) => {
       const p = await tx.persona.create({
-        data: { codigo: codigo.trim(), dni: dni.trim(), nombreCompleto: nombreCompleto.trim(), tiendaBaseId: tiendaBaseId || null, activo: activo ?? true },
+        data: { codigo: codigo.trim(), nombreCompleto: nombreCompleto.trim(), tiendaBaseId: tiendaBaseId || null, activo: activo ?? true },
       });
       if (roles?.length) {
         await tx.rolPersona.createMany({ data: roles.map((r: string) => ({ personaId: p.id, rol: r })) });
