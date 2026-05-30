@@ -8,10 +8,9 @@ export default async function HQLayout({ children }: { children: React.ReactNode
   const user = getSession();
   if (!user) redirect("/login");
 
-  const hqRoles = ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR"];
+  const hqRoles = ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR", "GERENTE_ZONAL"];
   if (!hqRoles.includes(user.rol)) {
     if (user.rol === "TIENDA") redirect(`/store/${user.storeId}`);
-    if (user.rol === "GERENTE_ZONAL") redirect(`/zona/${user.zonaId}`);
     redirect("/login");
   }
 

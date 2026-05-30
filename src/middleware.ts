@@ -65,6 +65,13 @@ export function middleware(req: NextRequest): NextResponse {
   // HQ routes
   if (pathname.startsWith("/hq")) {
     const hqRoles = ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR"];
+
+    // GERENTE_ZONAL can only enter HQ through descansos module
+    if (user.rol === "GERENTE_ZONAL") {
+      if (pathname.startsWith("/hq/descansos")) return NextResponse.next();
+      return NextResponse.redirect(new URL(user.zonaId ? `/zona/${user.zonaId}` : "/login", req.url));
+    }
+
     if (!hqRoles.includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "PROGRAMADOR") {
       const allowed = ["/hq", "/hq/programacion", "/hq/reports"];

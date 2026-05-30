@@ -16,12 +16,15 @@ model Empresa {
 }
 
 model Zona {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  createdAt DateTime  @default(now())
+  id                    String    @id @default(cuid())
+  name                  String    @unique
+  responsableZonaId     String?
+  supervisorAprobadorId String?
+  createdAt             DateTime  @default(now())
 
-  stores    Store[]
-  usuarios  Usuario[]
+  stores               Store[]
+  usuarios             Usuario[]
+  programacionesDescanso ProgramacionDescanso[]
 }
 
 model Genero {
@@ -34,21 +37,30 @@ model Genero {
 }
 
 model Store {
-  id              String               @id @default(cuid())
-  name            String
-  distrito        String
-  ciudad          String
-  empresaId       String?
-  zonaId          String?
-  createdAt       DateTime             @default(now())
+  id                      String   @id @default(cuid())
+  name                    String
+  distrito                String
+  ciudad                  String
+  empresaId               String?
+  zonaId                  String?
+  formatoDireccion        String?  // "FORMATO_1" | "FORMATO_2"
+  gerenteTitularId        String?
+  jefeTurnoTitularId      String?
+  cantSupervisoresTesoros Int      @default(1)
+  tieneSupervisorAsesoria Boolean  @default(false)
+  createdAt               DateTime @default(now())
 
-  empresa         Empresa?             @relation(fields: [empresaId], references: [id])
-  zona            Zona?                @relation(fields: [zonaId], references: [id])
-  countTasks      CountTask[]
-  systemStocks    SystemStock[]
+  empresa             Empresa?             @relation(fields: [empresaId], references: [id])
+  zona                Zona?                @relation(fields: [zonaId], references: [id])
+  gerenteTitular      Persona?             @relation("GerenteTitular", fields: [gerenteTitularId], references: [id], onDelete: SetNull)
+  jefeTurnoTitular    Persona?             @relation("JefeTurnoTitular", fields: [jefeTurnoTitularId], references: [id], onDelete: SetNull)
+  countTasks          CountTask[]
+  systemStocks        SystemStock[]
   programacionTiendas ProgramacionTienda[]
-  conteoRegistros ConteoRegistro[]
-  usuarios        Usuario[]
+  conteoRegistros     ConteoRegistro[]
+  usuarios            Usuario[]
+  personasBase        Persona[]            @relation("PersonaTiendaBase")
+  registrosDescanso   RegistroDescanso[]
 }
 
 model Brand {
@@ -186,14 +198,113 @@ model Usuario {
   id        String   @id @default(cuid())
   nombre    String
   username  String   @unique
-  password  String                        // bcrypt hash
+  password  String
   rol       String
   activo    Boolean  @default(true)
-  storeId   String?                       // only for TIENDA
-  zonaId    String?                       // only for GERENTE_ZONAL
+  storeId   String?
+  zonaId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   store     Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
   zona      Zona?    @relation(fields: [zonaId], references: [id], onDelete: SetNull)
+
+  programacionesCreadaPor   ProgramacionDescanso[] @relation("ProgramacionCreadaPor")
+  programacionesAprobadaPor ProgramacionDescanso[] @relation("ProgramacionAprobadaPor")
+  auditoriasDescanso        AuditoriaDescanso[]
+}
+
+// =====================================================
+// MÓDULO DESCANSOS
+// =====================================================
+
+model Persona {
+  id             String   @id @default(cuid())
+  codigo         String   @unique
+  dni            String   @unique
+  nombreCompleto String
+  tiendaBaseId   String?
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tiendaBase          Store?                @relation("PersonaTiendaBase", fields: [tiendaBaseId], references: [id], onDelete: SetNull)
+  roles               RolPersona[]
+  elegibilidades      ElegibilidadCobertura[]
+  descansos           RegistroDescanso[]    @relation("PersonaDescanso")
+  coberturas          RegistroDescanso[]    @relation("PersonaCobertura")
+  tiendaGerenteTitular Store[]             @relation("GerenteTitular")
+  tiendaJefeTurno      Store[]             @relation("JefeTurnoTitular")
+}
+
+model RolPersona {
+  id        String   @id @default(cuid())
+  personaId String
+  rol       String   // RolPersonal enum values
+
+  persona   Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@unique([personaId, rol])
+}
+
+model ElegibilidadCobertura {
+  id          String  @id @default(cuid())
+  personaId   String
+  rolHabilita String  // RolPersonal enum values
+
+  persona     Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@unique([personaId, rolHabilita])
+}
+
+model ProgramacionDescanso {
+  id            String   @id @default(cuid())
+  zonaId        String
+  periodoInicio DateTime @db.Date
+  periodoFin    DateTime @db.Date
+  estado        String   @default("BORRADOR") // BORRADOR | PENDIENTE_APROBACION | APROBADO | RECHAZADO
+  motivoRechazo String?
+  creadoPorId   String
+  aprobadoPorId String?
+  aprobadoEn    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  zona        Zona      @relation(fields: [zonaId], references: [id])
+  creadoPor   Usuario   @relation("ProgramacionCreadaPor", fields: [creadoPorId], references: [id])
+  aprobadoPor Usuario?  @relation("ProgramacionAprobadaPor", fields: [aprobadoPorId], references: [id])
+  registros   RegistroDescanso[]
+  auditoria   AuditoriaDescanso[]
+}
+
+model RegistroDescanso {
+  id                   String   @id @default(cuid())
+  programacionId       String
+  storeId              String
+  personaId            String
+  cargo                String   // RolPersonal
+  tipoMovimiento       String   // TipoMovimiento
+  coberturaId          String?
+  observacion          String?
+  fecha                DateTime @db.Date
+  alertaSabadoAceptada Boolean  @default(false)
+  createdAt            DateTime @default(now())
+
+  programacion ProgramacionDescanso @relation(fields: [programacionId], references: [id], onDelete: Cascade)
+  store        Store                @relation(fields: [storeId], references: [id])
+  persona      Persona              @relation("PersonaDescanso", fields: [personaId], references: [id])
+  cobertura    Persona?             @relation("PersonaCobertura", fields: [coberturaId], references: [id])
+}
+
+model AuditoriaDescanso {
+  id             String   @id @default(cuid())
+  programacionId String
+  usuarioId      String
+  accion         String   // CREAR | EDITAR | ENVIAR | APROBAR | RECHAZAR
+  valorAnterior  Json?
+  valorNuevo     Json?
+  fechaHora      DateTime @default(now())
+
+  programacion ProgramacionDescanso @relation(fields: [programacionId], references: [id], onDelete: Cascade)
+  usuario      Usuario              @relation(fields: [usuarioId], references: [id])
 }
