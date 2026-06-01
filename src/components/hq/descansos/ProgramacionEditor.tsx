@@ -301,7 +301,7 @@ export function ProgramacionEditor({ programacion, stores, personas, canEdit, ca
         {showForm && canEdit && (
           <div className="border-b border-gray-100 bg-blue-50 px-5 py-4">
             <h3 className="text-sm font-semibold text-blue-900 mb-3">Nuevo registro</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Fecha *</label>
                 <input type="date" value={form.fecha}

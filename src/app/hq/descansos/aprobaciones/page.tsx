@@ -31,7 +31,7 @@ export default async function AprobacionesPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="p-4 sm:p-6 max-w-4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Aprobaciones</h1>
         <p className="text-sm text-gray-500 mt-0.5">Revisa y aprueba programaciones de descansos pendientes</p>
@@ -78,7 +78,7 @@ export default async function AprobacionesPage() {
       {recientes.length > 0 && (
         <>
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Historial reciente</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>

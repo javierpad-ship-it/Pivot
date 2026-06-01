@@ -16,7 +16,7 @@ export default async function NuevaProgramacionPage() {
   });
 
   return (
-    <div className="p-6 max-w-lg">
+    <div className="p-4 sm:p-6 max-w-lg">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Nueva Programación</h1>
         <p className="text-sm text-gray-500 mt-0.5">Define el período y la zona para iniciar la programación de descansos</p>

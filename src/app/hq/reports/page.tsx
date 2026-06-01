@@ -37,8 +37,8 @@ export default async function ReportsPage({ searchParams }: Props) {
   const exportUrl = `/api/reports/export?${exportParams.toString()}`;
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Reporte de Diferencias</h1>
           <p className="text-sm text-gray-500 mt-1">Cantidad contada vs stock en sistema</p>
@@ -46,7 +46,7 @@ export default async function ReportsPage({ searchParams }: Props) {
         <ExportButton url={exportUrl} disabled={rows.length === 0} />
       </div>
 
-      <div className="grid grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-6 sm:gap-6">
         <Card><CardBody>
           <p className="text-sm text-gray-500">Conteos Registrados</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{rows.length}</p>

@@ -59,7 +59,7 @@ export default async function EditProgramacionPage({ params }: { params: { id: s
   const canApprove = ["SUPER_ADMIN", "ADMIN"].includes(user?.rol ?? "");
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-4 sm:p-6 max-w-6xl">
       <ProgramacionEditor
         programacion={{
           id: prog.id,

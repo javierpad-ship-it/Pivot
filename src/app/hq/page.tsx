@@ -31,8 +31,8 @@ export default async function HQDashboard() {
   ]);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm mt-1">Resumen de conteos cíclicos</p>
@@ -54,7 +54,7 @@ export default async function HQDashboard() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
             Hoy — {DAY_NAMES[todayJs]}
           </p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <Card><CardBody>
               <p className="text-sm text-gray-500">Programados hoy</p>
               <p className="text-3xl font-bold text-blue-700 mt-1">{totalProgramado}</p>
@@ -73,7 +73,7 @@ export default async function HQDashboard() {
       )}
 
       {/* Tareas individuales */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-3 mb-6 sm:gap-4">
         <Card><CardBody>
           <p className="text-sm text-gray-500">Tareas Total</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{totalTasks}</p>
@@ -133,7 +133,7 @@ export default async function HQDashboard() {
         </div>
       </Card>
 
-      <div className="mt-6 grid grid-cols-3 gap-4">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <Link href="/hq/programacion">
           <Card className="hover:border-blue-300 transition-colors cursor-pointer">
             <CardBody className="flex items-center gap-3">

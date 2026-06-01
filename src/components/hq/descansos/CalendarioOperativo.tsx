@@ -65,7 +65,7 @@ export function CalendarioOperativo({ lunes, zonas, zonaIdSelected, registros }:
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <div className="flex items-center gap-1">
           <button onClick={() => navSemana(-1)}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors">

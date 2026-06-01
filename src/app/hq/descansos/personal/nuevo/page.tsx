@@ -10,7 +10,7 @@ export default async function NuevaPersonaPage() {
   });
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-4 sm:p-6 max-w-2xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Nueva Persona</h1>
         <p className="text-sm text-gray-500 mt-0.5">Registra un colaborador para programación de descansos</p>

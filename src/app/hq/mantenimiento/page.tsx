@@ -113,13 +113,13 @@ const sections = [
 
 export default function MantenimientoPage() {
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 sm:p-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mantenimiento</h1>
         <p className="text-sm text-gray-500 mt-1">Administra tiendas, empresas, zonas, marcas, mundos y líneas</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 max-w-2xl sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 max-w-2xl">
         {sections.map((s) => (
           <Link key={s.href} href={s.href}
             className="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-gray-300 transition-all">
