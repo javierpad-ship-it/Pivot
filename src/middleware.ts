@@ -74,7 +74,7 @@ export function middleware(req: NextRequest): NextResponse {
 
     if (!hqRoles.includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "PROGRAMADOR") {
-      const allowed = ["/hq", "/hq/programacion", "/hq/reports"];
+      const allowed = ["/hq", "/hq/programacion", "/hq/reports", "/hq/cuotas"];
       const ok = allowed.some((p) => pathname === p || pathname.startsWith(p + "/"));
       if (!ok) return NextResponse.redirect(new URL("/hq/programacion", req.url));
     }

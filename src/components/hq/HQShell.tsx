@@ -53,6 +53,21 @@ const CONTEO_ITEMS = [
   },
 ];
 
+// ─── MÓDULO VENTAS ───────────────────────────────────────────────────────────
+const VENTAS_ITEMS = [
+  {
+    href: "/hq/cuotas",
+    label: "Cuotas semanales",
+    roles: ["SUPER_ADMIN", "ADMIN", "PROGRAMADOR"],
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    ),
+  },
+];
+
 // ─── MÓDULO DESCANSOS ─────────────────────────────────────────────────────────
 const DESCANSOS_ITEMS = [
   {
@@ -142,6 +157,7 @@ function ModuleSection({
   userRole,
   pathname,
   onClose,
+  defaultOpen,
 }: {
   title: string;
   color: string;
@@ -149,31 +165,50 @@ function ModuleSection({
   userRole: string;
   pathname: string;
   onClose?: () => void;
+  defaultOpen?: boolean;
 }) {
   const visible = items.filter((i) => i.roles.includes(userRole));
   if (visible.length === 0) return null;
 
+  const hasActive = visible.some((item) =>
+    item.href === "/hq" ? pathname === "/hq" : pathname.startsWith(item.href)
+  );
+  const [open, setOpen] = useState(defaultOpen ?? hasActive);
+
   return (
     <div>
-      <p className={`px-3 mb-1 text-[10px] font-bold uppercase tracking-widest ${color}`}>{title}</p>
-      <div className="space-y-0.5">
-        {visible.map((item) => {
-          const isActive =
-            item.href === "/hq"
-              ? pathname === "/hq"
-              : pathname.startsWith(item.href);
-          return (
-            <NavItem
-              key={item.href}
-              href={item.href}
-              label={item.label}
-              icon={item.icon}
-              isActive={isActive}
-              onClick={onClose}
-            />
-          );
-        })}
-      </div>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between px-3 mb-1 group`}
+      >
+        <span className={`text-[10px] font-bold uppercase tracking-widest ${color}`}>{title}</span>
+        <svg
+          className={`w-3 h-3 transition-transform text-gray-400 group-hover:text-gray-600 ${open ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="space-y-0.5">
+          {visible.map((item) => {
+            const isActive =
+              item.href === "/hq"
+                ? pathname === "/hq"
+                : pathname.startsWith(item.href);
+            return (
+              <NavItem
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                isActive={isActive}
+                onClick={onClose}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -226,6 +261,14 @@ function SidebarContent({
           title="Conteo"
           color="text-blue-500"
           items={CONTEO_ITEMS}
+          userRole={user.rol}
+          pathname={pathname}
+          onClose={onClose}
+        />
+        <ModuleSection
+          title="Ventas"
+          color="text-emerald-600"
+          items={VENTAS_ITEMS}
           userRole={user.rol}
           pathname={pathname}
           onClose={onClose}

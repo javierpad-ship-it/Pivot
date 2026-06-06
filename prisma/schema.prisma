@@ -61,6 +61,7 @@ model Store {
   usuarios            Usuario[]
   personasBase        Persona[]            @relation("PersonaTiendaBase")
   registrosDescanso   RegistroDescanso[]
+  cuotasVentas        CuotaVentas[]
 }
 
 model Brand {
@@ -191,6 +192,36 @@ model ConfigDia {
   dayOfWeek Int     @id  // 1=Lunes … 7=Domingo
   name      String
   enabled   Boolean @default(false)
+}
+
+// =====================================================
+// MÓDULO CUOTAS DE VENTAS
+// =====================================================
+
+model CuotaVentas {
+  id        String   @id @default(cuid())
+  storeId   String
+  semana    Int      // ISO week number (1-53)
+  anio      Int
+  monto     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store  Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  ventas VentaReal[]
+
+  @@unique([storeId, semana, anio])
+}
+
+model VentaReal {
+  id        String   @id @default(cuid())
+  cuotaId   String
+  fecha     DateTime @db.Date
+  monto     Float
+  empleado  String?
+  createdAt DateTime @default(now())
+
+  cuota CuotaVentas @relation(fields: [cuotaId], references: [id], onDelete: Cascade)
 }
 
 // Roles: SUPER_ADMIN | ADMIN | PROGRAMADOR | GERENTE_ZONAL | TIENDA
