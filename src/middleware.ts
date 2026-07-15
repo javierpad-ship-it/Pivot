@@ -99,6 +99,9 @@ export function middleware(req: NextRequest): NextResponse {
   // Membresía LK routes
   if (pathname.startsWith("/membresia-lk")) {
     if (!["SUPER_ADMIN", "ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);
+    if (pathname.startsWith("/membresia-lk/wallets") && !["SUPER_ADMIN", "ADMIN"].includes(user.rol)) {
+      return NextResponse.redirect(new URL("/membresia-lk", req.url));
+    }
     return NextResponse.next();
   }
 

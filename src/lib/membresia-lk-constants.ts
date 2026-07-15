@@ -44,10 +44,31 @@ export const TIPO_MOVIMIENTO_LABELS: Record<string, string> = {
   COMPRA: "Compra",
   CANJE: "Canje",
   AJUSTE: "Ajuste",
+  SELLO: "Sello",
+  PREMIO: "Premio canjeado",
 };
 
 export const TIPO_MOVIMIENTO_COLORS: Record<string, string> = {
   COMPRA: "bg-green-100 text-green-800",
   CANJE: "bg-red-100 text-red-700",
   AJUSTE: "bg-blue-100 text-blue-800",
+  SELLO: "bg-green-100 text-green-800",
+  PREMIO: "bg-purple-100 text-purple-700",
+};
+
+// ─── DISEÑOS DE TARJETA (Google/Apple Wallet) ───────────────────────────────
+
+export const TIPO_TARJETA_LABELS: Record<string, string> = {
+  PUNTOS: "Puntos",
+  ESTAMPITAS: "Estampitas",
+};
+
+export const TIPO_TARJETA_OPTIONS = Object.entries(TIPO_TARJETA_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+export const TIPO_TARJETA_BADGE_VARIANT: Record<string, "green" | "yellow" | "red" | "blue" | "gray"> = {
+  PUNTOS: "blue",
+  ESTAMPITAS: "green",
 };

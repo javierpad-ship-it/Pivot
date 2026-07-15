@@ -351,21 +351,61 @@ model MembresiaCliente {
   puntos           Int      @default(0) // saldo canjeable actual
   puntosAcumulados Int      @default(0) // total histórico, define el nivel
   nivel            String   @default("BRONCE") // BRONCE | PLATA | ORO | PLATINO
+  estampitas       Int      @default(0) // progreso actual hacia el premio (tarjetas tipo ESTAMPITAS)
+  premiosCanjeados Int      @default(0) // historial de premios de estampitas ganados
   activo           Boolean  @default(true)
   createdAt        DateTime @default(now())
 
-  store       Store?                @relation(fields: [storeId], references: [id], onDelete: SetNull)
-  movimientos MembresiaMovimiento[]
+  walletDisenoId  String?
+  googleObjectId  String? @unique // ID del Loyalty Object en Google Wallet, una vez emitido
+  applePassSerial String? @unique // serialNumber del .pkpass de Apple Wallet, una vez emitido
+
+  store        Store?                  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  walletDiseno MembresiaDisenoTarjeta? @relation(fields: [walletDisenoId], references: [id], onDelete: SetNull)
+  movimientos  MembresiaMovimiento[]
 }
 
 model MembresiaMovimiento {
   id          String   @id @default(cuid())
   clienteId   String
-  tipo        String // COMPRA | CANJE | AJUSTE
-  puntos      Int // positivo en COMPRA/AJUSTE+, negativo en CANJE/AJUSTE-
+  tipo        String // COMPRA | CANJE | AJUSTE | SELLO | PREMIO
+  puntos      Int // delta de puntos o de estampitas según el tipo de tarjeta del cliente
   montoCompra Float?
   descripcion String?
   createdAt   DateTime @default(now())
 
   cliente MembresiaCliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+}
+
+// Plantilla de diseño de tarjeta (puntos o estampitas), reutilizable para Google/Apple Wallet
+model MembresiaDisenoTarjeta {
+  id                String   @id @default(cuid())
+  nombre            String // nombre interno del diseño, ej. "Tarjeta VIP Lukers"
+  tipo              String // PUNTOS | ESTAMPITAS
+  activo            Boolean  @default(false) // el diseño activo por tipo es el usado al emitir tarjetas nuevas
+  nombrePrograma    String // nombre visible del programa en la tarjeta
+  descripcion       String?
+  logoUrl           String?
+  heroImageUrl      String?
+  colorFondo        String   @default("#1a73e8")
+  colorTexto        String   @default("#ffffff")
+  totalEstampitas   Int? // solo ESTAMPITAS: cantidad de sellos para ganar el premio
+  premioDescripcion String? // solo ESTAMPITAS: qué se gana al completar la tarjeta
+  googleClassId     String? // se completa al publicar el diseño en Google Wallet
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  clientes MembresiaCliente[]
+}
+
+// Credenciales de integración con Google/Apple Wallet (registro único, cifrado en reposo)
+model MembresiaWalletConfig {
+  id                          String   @id @default(cuid())
+  googleIssuerId              String?
+  googleServiceAccountJsonEnc String? // JSON del service account, cifrado
+  appleTeamId                 String?
+  applePassTypeId             String?
+  appleCertP12Enc             String? // certificado .p12 (base64), cifrado
+  appleCertPasswordEnc        String? // contraseña del .p12, cifrada
+  updatedAt                   DateTime @updatedAt
 }

@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { SessionUser } from "@/lib/session";
 
+// hrefs whose nav item should only highlight on an exact pathname match (they'd
+// otherwise also light up for their own sub-routes, e.g. /hq/programacion)
+const EXACT_MATCH_HREFS = new Set(["/hq", "/membresia-lk"]);
+
 // ─── MÓDULO CONTEO ───────────────────────────────────────────────────────────
 const CONTEO_ITEMS = [
   {
@@ -78,6 +82,17 @@ const MEMBRESIA_ITEMS = [
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
           d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/membresia-lk/wallets",
+    label: "Diseños de Wallet",
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M3 10h18M7 15h1m4 0h1m-7 4h16a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
   },
@@ -184,7 +199,7 @@ function ModuleSection({
 }) {
   const visible = items.filter((i) => i.roles.includes(userRole));
   const hasActive = visible.some((item) =>
-    item.href === "/hq" ? pathname === "/hq" : pathname.startsWith(item.href)
+    EXACT_MATCH_HREFS.has(item.href) ? pathname === item.href : pathname.startsWith(item.href)
   );
   const [open, setOpen] = useState(defaultOpen ?? hasActive);
 
@@ -207,10 +222,9 @@ function ModuleSection({
       {open && (
         <div className="space-y-0.5">
           {visible.map((item) => {
-            const isActive =
-              item.href === "/hq"
-                ? pathname === "/hq"
-                : pathname.startsWith(item.href);
+            const isActive = EXACT_MATCH_HREFS.has(item.href)
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
             return (
               <NavItem
                 key={item.href}
