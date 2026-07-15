@@ -16,6 +16,21 @@ export function calcularNivel(puntosAcumulados: number): string {
   return NIVEL_UMBRALES.find((n) => puntosAcumulados >= n.minPuntos)!.nivel;
 }
 
+const NIVEL_ORDEN_ASC = [...NIVEL_UMBRALES].reverse();
+
+export function calcularProgresoNivel(puntosAcumulados: number): {
+  siguiente: { nivel: string; minPuntos: number } | null;
+  porcentaje: number;
+} {
+  const siguiente = NIVEL_ORDEN_ASC.find((n) => n.minPuntos > puntosAcumulados);
+  if (!siguiente) return { siguiente: null, porcentaje: 100 };
+  const actualIdx = NIVEL_ORDEN_ASC.findIndex((n) => n.nivel === siguiente.nivel) - 1;
+  const base = actualIdx >= 0 ? NIVEL_ORDEN_ASC[actualIdx].minPuntos : 0;
+  const rango = siguiente.minPuntos - base;
+  const porcentaje = Math.min(100, Math.round(((puntosAcumulados - base) / rango) * 100));
+  return { siguiente, porcentaje };
+}
+
 export const NIVEL_LABELS: Record<string, string> = {
   BRONCE: "Bronce",
   PLATA: "Plata",

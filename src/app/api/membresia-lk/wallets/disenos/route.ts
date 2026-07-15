@@ -10,8 +10,23 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { nombre, tipo, nombrePrograma, descripcion, logoUrl, heroImageUrl, colorFondo, colorTexto, totalEstampitas, premioDescripcion, activo } =
-    await req.json();
+  const {
+    nombre,
+    tipo,
+    nombrePrograma,
+    descripcion,
+    logoUrl,
+    heroImageUrl,
+    colorFondo,
+    colorTexto,
+    totalEstampitas,
+    premioDescripcion,
+    beneficioBronce,
+    beneficioPlata,
+    beneficioOro,
+    beneficioPlatino,
+    activo,
+  } = await req.json();
 
   if (!nombre?.trim() || !nombrePrograma?.trim()) {
     return NextResponse.json({ error: "Nombre y nombre del programa son requeridos" }, { status: 400 });
@@ -34,6 +49,10 @@ export async function POST(req: NextRequest) {
     colorTexto: colorTexto?.trim() || "#ffffff",
     totalEstampitas: tipo === "ESTAMPITAS" ? Number(totalEstampitas) : null,
     premioDescripcion: tipo === "ESTAMPITAS" ? premioDescripcion?.trim() || null : null,
+    beneficioBronce: tipo === "PUNTOS" ? beneficioBronce?.trim() || null : null,
+    beneficioPlata: tipo === "PUNTOS" ? beneficioPlata?.trim() || null : null,
+    beneficioOro: tipo === "PUNTOS" ? beneficioOro?.trim() || null : null,
+    beneficioPlatino: tipo === "PUNTOS" ? beneficioPlatino?.trim() || null : null,
     activo: !!activo,
   };
 

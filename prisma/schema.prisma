@@ -359,6 +359,7 @@ model MembresiaCliente {
   walletDisenoId  String?
   googleObjectId  String? @unique // ID del Loyalty Object en Google Wallet, una vez emitido
   applePassSerial String? @unique // serialNumber del .pkpass de Apple Wallet, una vez emitido
+  portalToken     String  @unique @default(dbgenerated("gen_random_uuid()")) // token del enlace público /mi-tarjeta/[token]
 
   store        Store?                  @relation(fields: [storeId], references: [id], onDelete: SetNull)
   walletDiseno MembresiaDisenoTarjeta? @relation(fields: [walletDisenoId], references: [id], onDelete: SetNull)
@@ -391,6 +392,10 @@ model MembresiaDisenoTarjeta {
   colorTexto        String   @default("#ffffff")
   totalEstampitas   Int? // solo ESTAMPITAS: cantidad de sellos para ganar el premio
   premioDescripcion String? // solo ESTAMPITAS: qué se gana al completar la tarjeta
+  beneficioBronce   String? // solo PUNTOS: beneficio visible al cliente en el nivel Bronce
+  beneficioPlata    String? // solo PUNTOS: beneficio visible al cliente en el nivel Plata
+  beneficioOro      String? // solo PUNTOS: beneficio visible al cliente en el nivel Oro
+  beneficioPlatino  String? // solo PUNTOS: beneficio visible al cliente en el nivel Platino
   googleClassId     String? // se completa al publicar el diseño en Google Wallet
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

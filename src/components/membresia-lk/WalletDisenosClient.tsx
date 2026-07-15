@@ -21,6 +21,10 @@ interface Diseno {
   colorTexto: string;
   totalEstampitas: number | null;
   premioDescripcion: string | null;
+  beneficioBronce: string | null;
+  beneficioPlata: string | null;
+  beneficioOro: string | null;
+  beneficioPlatino: string | null;
 }
 
 const EMPTY_FORM = {
@@ -34,6 +38,10 @@ const EMPTY_FORM = {
   colorTexto: "#ffffff",
   totalEstampitas: "10",
   premioDescripcion: "",
+  beneficioBronce: "",
+  beneficioPlata: "",
+  beneficioOro: "",
+  beneficioPlatino: "",
   activo: false,
 };
 
@@ -65,6 +73,10 @@ export function WalletDisenosClient({ disenos }: { disenos: Diseno[] }) {
       colorTexto: d.colorTexto,
       totalEstampitas: String(d.totalEstampitas ?? 10),
       premioDescripcion: d.premioDescripcion ?? "",
+      beneficioBronce: d.beneficioBronce ?? "",
+      beneficioPlata: d.beneficioPlata ?? "",
+      beneficioOro: d.beneficioOro ?? "",
+      beneficioPlatino: d.beneficioPlatino ?? "",
       activo: d.activo,
     });
     setEditId(d.id);
@@ -216,6 +228,39 @@ export function WalletDisenosClient({ disenos }: { disenos: Diseno[] }) {
               </>
             )}
           </div>
+          {form.tipo === "PUNTOS" && (
+            <div>
+              <p className="text-xs font-medium text-gray-600 mb-2">
+                Beneficios por nivel (lo que ve el cliente en su portal /mi-tarjeta)
+              </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Input
+                  label="Bronce"
+                  placeholder="Ej: Bienvenida al programa"
+                  value={form.beneficioBronce}
+                  onChange={(e) => setForm((f) => ({ ...f, beneficioBronce: e.target.value }))}
+                />
+                <Input
+                  label="Plata"
+                  placeholder="Ej: 5% dcto en accesorios"
+                  value={form.beneficioPlata}
+                  onChange={(e) => setForm((f) => ({ ...f, beneficioPlata: e.target.value }))}
+                />
+                <Input
+                  label="Oro"
+                  placeholder="Ej: 10% dcto en toda la tienda"
+                  value={form.beneficioOro}
+                  onChange={(e) => setForm((f) => ({ ...f, beneficioOro: e.target.value }))}
+                />
+                <Input
+                  label="Platino"
+                  placeholder="Ej: Envío gratis + regalo de cumpleaños"
+                  value={form.beneficioPlatino}
+                  onChange={(e) => setForm((f) => ({ ...f, beneficioPlatino: e.target.value }))}
+                />
+              </div>
+            </div>
+          )}
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input
               type="checkbox"

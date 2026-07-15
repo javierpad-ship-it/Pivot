@@ -43,7 +43,7 @@ export function middleware(req: NextRequest): NextResponse {
   const user = parseSessionCookie(req);
 
   // Public paths — no auth needed
-  if (pathname === "/login" || pathname.startsWith("/api/auth/")) {
+  if (pathname === "/login" || pathname.startsWith("/api/auth/") || pathname.startsWith("/mi-tarjeta/")) {
     if (pathname === "/login" && user) return redirectByRole(user, req);
     return NextResponse.next();
   }

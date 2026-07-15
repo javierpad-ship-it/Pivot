@@ -6,8 +6,22 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const existente = await prisma.membresiaDisenoTarjeta.findUnique({ where: { id: params.id } });
   if (!existente) return NextResponse.json({ error: "Diseño no encontrado" }, { status: 404 });
 
-  const { nombre, nombrePrograma, descripcion, logoUrl, heroImageUrl, colorFondo, colorTexto, totalEstampitas, premioDescripcion, activo } =
-    await req.json();
+  const {
+    nombre,
+    nombrePrograma,
+    descripcion,
+    logoUrl,
+    heroImageUrl,
+    colorFondo,
+    colorTexto,
+    totalEstampitas,
+    premioDescripcion,
+    beneficioBronce,
+    beneficioPlata,
+    beneficioOro,
+    beneficioPlatino,
+    activo,
+  } = await req.json();
 
   if (!nombre?.trim() || !nombrePrograma?.trim()) {
     return NextResponse.json({ error: "Nombre y nombre del programa son requeridos" }, { status: 400 });
@@ -26,6 +40,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     colorTexto: colorTexto?.trim() || "#ffffff",
     totalEstampitas: existente.tipo === "ESTAMPITAS" ? Number(totalEstampitas) : null,
     premioDescripcion: existente.tipo === "ESTAMPITAS" ? premioDescripcion?.trim() || null : null,
+    beneficioBronce: existente.tipo === "PUNTOS" ? beneficioBronce?.trim() || null : null,
+    beneficioPlata: existente.tipo === "PUNTOS" ? beneficioPlata?.trim() || null : null,
+    beneficioOro: existente.tipo === "PUNTOS" ? beneficioOro?.trim() || null : null,
+    beneficioPlatino: existente.tipo === "PUNTOS" ? beneficioPlatino?.trim() || null : null,
     activo: !!activo,
   };
 

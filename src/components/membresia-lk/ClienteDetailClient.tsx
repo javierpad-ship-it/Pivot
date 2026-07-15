@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import {
   NIVEL_LABELS,
   NIVEL_BADGE_VARIANT,
-  NIVEL_UMBRALES,
+  calcularProgresoNivel,
   TIPO_MOVIMIENTO_LABELS,
   TIPO_MOVIMIENTO_COLORS,
   SOLES_POR_PUNTO,
@@ -33,22 +33,12 @@ interface Cliente {
   puntos: number;
   puntosAcumulados: number;
   nivel: string;
+  portalToken: string;
   store: { id: string; name: string } | null;
   movimientos: Movimiento[];
 }
 
 const TIPO_OPTIONS = Object.entries(TIPO_MOVIMIENTO_LABELS).map(([value, label]) => ({ value, label }));
-
-function nivelProgreso(puntosAcumulados: number) {
-  const ordenAsc = [...NIVEL_UMBRALES].reverse();
-  const siguiente = ordenAsc.find((n) => n.minPuntos > puntosAcumulados);
-  if (!siguiente) return { siguiente: null, porcentaje: 100 };
-  const actualIdx = ordenAsc.findIndex((n) => n.nivel === siguiente.nivel) - 1;
-  const base = actualIdx >= 0 ? ordenAsc[actualIdx].minPuntos : 0;
-  const rango = siguiente.minPuntos - base;
-  const porcentaje = Math.min(100, Math.round(((puntosAcumulados - base) / rango) * 100));
-  return { siguiente, porcentaje };
-}
 
 export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) {
   const router = useRouter();
@@ -59,8 +49,16 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
   const [descripcion, setDescripcion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
-  const { siguiente, porcentaje } = nivelProgreso(cliente.puntosAcumulados);
+  const { siguiente, porcentaje } = calcularProgresoNivel(cliente.puntosAcumulados);
+
+  async function copiarEnlace() {
+    const url = `${window.location.origin}/mi-tarjeta/${cliente.portalToken}`;
+    await navigator.clipboard.writeText(url);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -129,6 +127,12 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
           ) : (
             <p className="text-xs text-gray-400">Nivel máximo alcanzado</p>
           )}
+          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+            <p className="text-xs text-gray-400">Portal del cliente (puntos, nivel y beneficios)</p>
+            <Button type="button" variant="secondary" size="sm" onClick={copiarEnlace}>
+              {copiado ? "¡Copiado!" : "Copiar enlace"}
+            </Button>
+          </div>
         </CardBody>
       </Card>
 
