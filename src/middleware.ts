@@ -96,6 +96,12 @@ export function middleware(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
+  // Membresía LK routes
+  if (pathname.startsWith("/membresia-lk")) {
+    if (!["SUPER_ADMIN", "ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);
+    return NextResponse.next();
+  }
+
   // Store routes
   if (pathname.startsWith("/store")) {
     if (!["SUPER_ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);

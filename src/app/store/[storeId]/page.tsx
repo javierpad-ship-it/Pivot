@@ -109,6 +109,15 @@ export default async function StoreDashboard({ params }: Props) {
           <h1 className="text-xl font-bold text-gray-900">{store.name}</h1>
           <p className="text-sm text-gray-500">{store.distrito} · {store.ciudad}</p>
         </div>
+        {/* Membresía LK */}
+        <Link href="/membresia-lk"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-100 transition-colors">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          Membresía LK
+        </Link>
         {/* Reporte — always accessible */}
         <Link href={`/store/${params.storeId}/reporte`}
           className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors">

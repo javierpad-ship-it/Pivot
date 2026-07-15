@@ -68,6 +68,21 @@ const VENTAS_ITEMS = [
   },
 ];
 
+// ─── MÓDULO MEMBRESÍA LK ─────────────────────────────────────────────────────
+const MEMBRESIA_ITEMS = [
+  {
+    href: "/membresia-lk",
+    label: "Clientes",
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+  },
+];
+
 // ─── MÓDULO DESCANSOS ─────────────────────────────────────────────────────────
 const DESCANSOS_ITEMS = [
   {
@@ -168,12 +183,12 @@ function ModuleSection({
   defaultOpen?: boolean;
 }) {
   const visible = items.filter((i) => i.roles.includes(userRole));
-  if (visible.length === 0) return null;
-
   const hasActive = visible.some((item) =>
     item.href === "/hq" ? pathname === "/hq" : pathname.startsWith(item.href)
   );
   const [open, setOpen] = useState(defaultOpen ?? hasActive);
+
+  if (visible.length === 0) return null;
 
   return (
     <div>
@@ -277,6 +292,14 @@ function SidebarContent({
           title="Descansos"
           color="text-teal-600"
           items={DESCANSOS_ITEMS}
+          userRole={user.rol}
+          pathname={pathname}
+          onClose={onClose}
+        />
+        <ModuleSection
+          title="Membresía LK"
+          color="text-purple-600"
+          items={MEMBRESIA_ITEMS}
           userRole={user.rol}
           pathname={pathname}
           onClose={onClose}

@@ -12,25 +12,25 @@ model Empresa {
   name      String   @unique
   createdAt DateTime @default(now())
 
-  stores    Store[]
+  stores Store[]
 }
 
 model Zona {
-  id                    String    @id @default(cuid())
-  name                  String    @unique
+  id                    String   @id @default(cuid())
+  name                  String   @unique
   responsableZonaId     String?
   supervisorAprobadorId String?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime @default(now())
 
-  stores               Store[]
-  usuarios             Usuario[]
+  stores                 Store[]
+  usuarios               Usuario[]
   programacionesDescanso ProgramacionDescanso[]
 }
 
 model Genero {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  createdAt       DateTime         @default(now())
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
 
   programaciones  Programacion[]
   conteoRegistros ConteoRegistro[]
@@ -43,7 +43,7 @@ model Store {
   ciudad                  String
   empresaId               String?
   zonaId                  String?
-  formatoDireccion        String?  // "FORMATO_1" | "FORMATO_2"
+  formatoDireccion        String? // "FORMATO_1" | "FORMATO_2"
   gerenteTitularId        String?
   jefeTurnoTitularId      String?
   cantSupervisoresTesoros Int      @default(1)
@@ -62,11 +62,12 @@ model Store {
   personasBase        Persona[]            @relation("PersonaTiendaBase")
   registrosDescanso   RegistroDescanso[]
   cuotasVentas        CuotaVentas[]
+  clientesMembresia   MembresiaCliente[]
 }
 
 model Brand {
-  id              String           @id @default(cuid())
-  name            String           @unique
+  id   String @id @default(cuid())
+  name String @unique
 
   countTasks      CountTask[]
   systemStocks    SystemStock[]
@@ -79,14 +80,14 @@ model Mundo {
   name      String   @unique
   createdAt DateTime @default(now())
 
-  lineas    Linea[]
+  lineas Linea[]
 }
 
 model Linea {
-  id              String           @id @default(cuid())
-  name            String
-  mundoId         String
-  createdAt       DateTime         @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  mundoId   String
+  createdAt DateTime @default(now())
 
   mundo           Mundo            @relation(fields: [mundoId], references: [id])
   countTasks      CountTask[]
@@ -98,30 +99,30 @@ model Linea {
 }
 
 model CountTask {
-  id          String      @id @default(cuid())
-  storeId     String
-  brandId     String
-  lineaId     String
-  status      String      @default("PENDING")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id        String   @id @default(cuid())
+  storeId   String
+  brandId   String
+  lineaId   String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  store       Store       @relation(fields: [storeId], references: [id])
-  brand       Brand       @relation(fields: [brandId], references: [id])
-  linea       Linea       @relation(fields: [lineaId], references: [id])
+  store       Store        @relation(fields: [storeId], references: [id])
+  brand       Brand        @relation(fields: [brandId], references: [id])
+  linea       Linea        @relation(fields: [lineaId], references: [id])
   countRecord CountRecord?
 
   @@unique([storeId, brandId, lineaId])
 }
 
 model CountRecord {
-  id           String    @id @default(cuid())
-  taskId       String    @unique
+  id           String   @id @default(cuid())
+  taskId       String   @unique
   quantity     Int
   employeeName String
-  countedAt    DateTime  @default(now())
+  countedAt    DateTime @default(now())
 
-  task         CountTask @relation(fields: [taskId], references: [id])
+  task CountTask @relation(fields: [taskId], references: [id])
 }
 
 model SystemStock {
@@ -132,9 +133,9 @@ model SystemStock {
   systemQuantity Int
   updatedAt      DateTime @updatedAt
 
-  store          Store    @relation(fields: [storeId], references: [id])
-  brand          Brand    @relation(fields: [brandId], references: [id])
-  linea          Linea    @relation(fields: [lineaId], references: [id])
+  store Store @relation(fields: [storeId], references: [id])
+  brand Brand @relation(fields: [brandId], references: [id])
+  linea Linea @relation(fields: [lineaId], references: [id])
 
   @@unique([storeId, brandId, lineaId])
 }
@@ -143,53 +144,53 @@ model SystemStock {
 
 model Programacion {
   id        String   @id @default(cuid())
-  dayOfWeek Int      // 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves
+  dayOfWeek Int // 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves
   scope     String   @default("ALL") // "ALL" = todas las tiendas, "SOME" = tiendas específicas
   brandId   String
   lineaId   String
   generoId  String
   createdAt DateTime @default(now())
 
-  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  linea     Linea    @relation(fields: [lineaId], references: [id], onDelete: Cascade)
-  genero    Genero   @relation(fields: [generoId], references: [id], onDelete: Cascade)
-  tiendas   ProgramacionTienda[]
+  brand   Brand                @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  linea   Linea                @relation(fields: [lineaId], references: [id], onDelete: Cascade)
+  genero  Genero               @relation(fields: [generoId], references: [id], onDelete: Cascade)
+  tiendas ProgramacionTienda[]
 
   @@unique([dayOfWeek, brandId, lineaId, generoId])
 }
 
 model ProgramacionTienda {
-  id             String       @id @default(cuid())
+  id             String @id @default(cuid())
   programacionId String
   storeId        String
 
-  programacion   Programacion @relation(fields: [programacionId], references: [id], onDelete: Cascade)
-  store          Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  programacion Programacion @relation(fields: [programacionId], references: [id], onDelete: Cascade)
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@unique([programacionId, storeId])
 }
 
 model ConteoRegistro {
-  id        String   @id @default(cuid())
-  storeId   String
-  brandId   String
-  lineaId   String
-  generoId  String
-  fecha     DateTime @db.Date
-  cantidad  Int
-  empleado  String
-  creadoEn  DateTime @default(now())
+  id       String   @id @default(cuid())
+  storeId  String
+  brandId  String
+  lineaId  String
+  generoId String
+  fecha    DateTime @db.Date
+  cantidad Int
+  empleado String
+  creadoEn DateTime @default(now())
 
-  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  brand     Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  linea     Linea   @relation(fields: [lineaId], references: [id], onDelete: Cascade)
-  genero    Genero  @relation(fields: [generoId], references: [id], onDelete: Cascade)
+  store  Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  brand  Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  linea  Linea  @relation(fields: [lineaId], references: [id], onDelete: Cascade)
+  genero Genero @relation(fields: [generoId], references: [id], onDelete: Cascade)
 
   @@unique([storeId, brandId, lineaId, generoId, fecha])
 }
 
 model ConfigDia {
-  dayOfWeek Int     @id  // 1=Lunes … 7=Domingo
+  dayOfWeek Int     @id // 1=Lunes … 7=Domingo
   name      String
   enabled   Boolean @default(false)
 }
@@ -201,7 +202,7 @@ model ConfigDia {
 model CuotaVentas {
   id        String   @id @default(cuid())
   storeId   String
-  semana    Int      // ISO week number (1-53)
+  semana    Int // ISO week number (1-53)
   anio      Int
   monto     Float
   createdAt DateTime @default(now())
@@ -237,8 +238,8 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  store     Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
-  zona      Zona?    @relation(fields: [zonaId], references: [id], onDelete: SetNull)
+  store Store? @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  zona  Zona?  @relation(fields: [zonaId], references: [id], onDelete: SetNull)
 
   programacionesCreadaPor   ProgramacionDescanso[] @relation("ProgramacionCreadaPor")
   programacionesAprobadaPor ProgramacionDescanso[] @relation("ProgramacionAprobadaPor")
@@ -258,51 +259,51 @@ model Persona {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  tiendaBase          Store?                @relation("PersonaTiendaBase", fields: [tiendaBaseId], references: [id], onDelete: SetNull)
-  roles               RolPersona[]
-  elegibilidades      ElegibilidadCobertura[]
-  descansos           RegistroDescanso[]    @relation("PersonaDescanso")
-  coberturas          RegistroDescanso[]    @relation("PersonaCobertura")
-  tiendaGerenteTitular Store[]             @relation("GerenteTitular")
-  tiendaJefeTurno      Store[]             @relation("JefeTurnoTitular")
+  tiendaBase           Store?                  @relation("PersonaTiendaBase", fields: [tiendaBaseId], references: [id], onDelete: SetNull)
+  roles                RolPersona[]
+  elegibilidades       ElegibilidadCobertura[]
+  descansos            RegistroDescanso[]      @relation("PersonaDescanso")
+  coberturas           RegistroDescanso[]      @relation("PersonaCobertura")
+  tiendaGerenteTitular Store[]                 @relation("GerenteTitular")
+  tiendaJefeTurno      Store[]                 @relation("JefeTurnoTitular")
 }
 
 model RolPersona {
-  id        String   @id @default(cuid())
+  id        String @id @default(cuid())
   personaId String
-  rol       String   // RolPersonal enum values
+  rol       String // RolPersonal enum values
 
-  persona   Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
 
   @@unique([personaId, rol])
 }
 
 model ElegibilidadCobertura {
-  id          String  @id @default(cuid())
+  id          String @id @default(cuid())
   personaId   String
-  rolHabilita String  // RolPersonal enum values
+  rolHabilita String // RolPersonal enum values
 
-  persona     Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
 
   @@unique([personaId, rolHabilita])
 }
 
 model ProgramacionDescanso {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   zonaId        String
-  periodoInicio DateTime @db.Date
-  periodoFin    DateTime @db.Date
-  estado        String   @default("BORRADOR") // BORRADOR | PENDIENTE_APROBACION | APROBADO | RECHAZADO
+  periodoInicio DateTime  @db.Date
+  periodoFin    DateTime  @db.Date
+  estado        String    @default("BORRADOR") // BORRADOR | PENDIENTE_APROBACION | APROBADO | RECHAZADO
   motivoRechazo String?
   creadoPorId   String
   aprobadoPorId String?
   aprobadoEn    DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  zona        Zona      @relation(fields: [zonaId], references: [id])
-  creadoPor   Usuario   @relation("ProgramacionCreadaPor", fields: [creadoPorId], references: [id])
-  aprobadoPor Usuario?  @relation("ProgramacionAprobadaPor", fields: [aprobadoPorId], references: [id])
+  zona        Zona                @relation(fields: [zonaId], references: [id])
+  creadoPor   Usuario             @relation("ProgramacionCreadaPor", fields: [creadoPorId], references: [id])
+  aprobadoPor Usuario?            @relation("ProgramacionAprobadaPor", fields: [aprobadoPorId], references: [id])
   registros   RegistroDescanso[]
   auditoria   AuditoriaDescanso[]
 }
@@ -312,8 +313,8 @@ model RegistroDescanso {
   programacionId       String
   storeId              String
   personaId            String
-  cargo                String   // RolPersonal
-  tipoMovimiento       String   // TipoMovimiento
+  cargo                String // RolPersonal
+  tipoMovimiento       String // TipoMovimiento
   coberturaId          String?
   observacion          String?
   fecha                DateTime @db.Date
@@ -330,11 +331,41 @@ model AuditoriaDescanso {
   id             String   @id @default(cuid())
   programacionId String
   usuarioId      String
-  accion         String   // CREAR | EDITAR | ENVIAR | APROBAR | RECHAZAR
+  accion         String // CREAR | EDITAR | ENVIAR | APROBAR | RECHAZAR
   valorAnterior  Json?
   valorNuevo     Json?
   fechaHora      DateTime @default(now())
 
   programacion ProgramacionDescanso @relation(fields: [programacionId], references: [id], onDelete: Cascade)
   usuario      Usuario              @relation(fields: [usuarioId], references: [id])
+}
+
+// ─── MEMBRESÍA LK (programa de fidelización de clientes) ───────────────────
+
+model MembresiaCliente {
+  id               String   @id @default(cuid())
+  nombre           String
+  dni              String?  @unique
+  telefono         String?
+  storeId          String?
+  puntos           Int      @default(0) // saldo canjeable actual
+  puntosAcumulados Int      @default(0) // total histórico, define el nivel
+  nivel            String   @default("BRONCE") // BRONCE | PLATA | ORO | PLATINO
+  activo           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  store       Store?                @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  movimientos MembresiaMovimiento[]
+}
+
+model MembresiaMovimiento {
+  id          String   @id @default(cuid())
+  clienteId   String
+  tipo        String // COMPRA | CANJE | AJUSTE
+  puntos      Int // positivo en COMPRA/AJUSTE+, negativo en CANJE/AJUSTE-
+  montoCompra Float?
+  descripcion String?
+  createdAt   DateTime @default(now())
+
+  cliente MembresiaCliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 }
