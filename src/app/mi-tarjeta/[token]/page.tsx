@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { NIVEL_LABELS, NIVEL_UMBRALES, calcularProgresoNivel, TIPO_MOVIMIENTO_LABELS } from "@/lib/membresia-lk-constants";
+import { GlassCard } from "@/components/membresia-lk/GlassCard";
+import { WalletCardPreview } from "@/components/membresia-lk/WalletCardPreview";
 
 export const dynamic = "force-dynamic";
 
@@ -18,23 +20,6 @@ const TIPO_MOVIMIENTO_GLASS: Record<string, string> = {
   SELLO: "bg-green-400/15 text-green-300 border border-green-400/20",
   PREMIO: "bg-purple-400/15 text-purple-300 border border-purple-400/20",
 };
-
-function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={`rounded-2xl p-5 sm:p-6 ${className}`}
-      style={{
-        background: "rgba(255,255,255,0.04)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 25px 50px rgba(0,0,0,0.35)",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 export default async function MiTarjetaPage({ params }: Props) {
   const cliente = await prisma.membresiaCliente.findUnique({
@@ -99,56 +84,21 @@ export default async function MiTarjetaPage({ params }: Props) {
       />
 
       <div className="max-w-md mx-auto space-y-5 relative z-10">
-        {/* Marca */}
-        <div className="text-center pt-2 pb-1">
-          {disenoPuntos?.logoUrl ? (
-            <div className="inline-flex items-center justify-center bg-white rounded-2xl px-6 py-3 shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={disenoPuntos.logoUrl} alt={nombrePrograma} className="h-6 object-contain" />
-            </div>
-          ) : (
-            <p className="text-xs font-medium tracking-[0.2em] uppercase" style={{ color: "rgba(255,255,255,0.4)" }}>
-              {nombrePrograma}
-            </p>
-          )}
-        </div>
-
-        {/* Tarjeta principal */}
-        <GlassCard>
-          <p className="text-xs uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
-            {nombrePrograma}
-          </p>
-          <h1 className="text-xl font-bold mt-1 text-white">{cliente.nombre}</h1>
-
-          <div className="flex items-end justify-between mt-6">
-            <div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
-                Puntos disponibles
-              </p>
-              <p className="text-4xl font-bold text-white mt-1">{cliente.puntos}</p>
-            </div>
-            <span
-              className="inline-flex px-3 py-1 rounded-full text-xs font-semibold text-white"
-              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
-            >
-              {NIVEL_LABELS[cliente.nivel] ?? cliente.nivel}
-            </span>
-          </div>
-
-          <div className="mt-5">
-            <div className="w-full rounded-full h-2 overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
-              <div
-                className="h-2 rounded-full transition-all"
-                style={{ width: `${porcentaje}%`, background: colorAcento }}
-              />
-            </div>
-            <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.4)" }}>
-              {siguiente
-                ? `${siguiente.minPuntos - cliente.puntosAcumulados} puntos para llegar a ${NIVEL_LABELS[siguiente.nivel]}`
-                : "Nivel máximo alcanzado"}
-            </p>
-          </div>
-        </GlassCard>
+        <WalletCardPreview
+          tipo="PUNTOS"
+          nombrePrograma={nombrePrograma}
+          logoUrl={disenoPuntos?.logoUrl ?? null}
+          colorAcento={colorAcento}
+          nombreCliente={cliente.nombre}
+          puntos={cliente.puntos}
+          nivelLabel={NIVEL_LABELS[cliente.nivel] ?? cliente.nivel}
+          porcentaje={porcentaje}
+          notaProgreso={
+            siguiente
+              ? `${siguiente.minPuntos - cliente.puntosAcumulados} puntos para llegar a ${NIVEL_LABELS[siguiente.nivel]}`
+              : "Nivel máximo alcanzado"
+          }
+        />
 
         {/* Beneficios por nivel */}
         <GlassCard>
@@ -161,13 +111,15 @@ export default async function MiTarjetaPage({ params }: Props) {
                   key={nivel}
                   className="flex items-start gap-3 rounded-xl p-3 transition-colors"
                   style={{
-                    background: alcanzado ? "rgba(0,140,255,0.1)" : "rgba(255,255,255,0.02)",
-                    border: alcanzado ? "1px solid rgba(0,140,255,0.2)" : "1px solid rgba(255,255,255,0.05)",
+                    background: alcanzado ? `color-mix(in srgb, ${colorAcento} 12%, transparent)` : "rgba(255,255,255,0.02)",
+                    border: alcanzado
+                      ? `1px solid color-mix(in srgb, ${colorAcento} 25%, transparent)`
+                      : "1px solid rgba(255,255,255,0.05)",
                   }}
                 >
                   <span
                     className="mt-1 w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ background: alcanzado ? "rgb(0,140,255)" : "rgba(255,255,255,0.2)" }}
+                    style={{ background: alcanzado ? colorAcento : "rgba(255,255,255,0.2)" }}
                   />
                   <div>
                     <p

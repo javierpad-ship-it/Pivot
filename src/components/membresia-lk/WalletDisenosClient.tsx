@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { TIPO_TARJETA_LABELS, TIPO_TARJETA_OPTIONS, TIPO_TARJETA_BADGE_VARIANT } from "@/lib/membresia-lk-constants";
+import { WalletCardPreview } from "./WalletCardPreview";
 
 interface Diseno {
   id: string;
@@ -44,6 +45,50 @@ const EMPTY_FORM = {
   beneficioPlatino: "",
   activo: false,
 };
+
+// Maqueta de teléfono con datos de ejemplo, para ver en vivo el diseño mientras se edita.
+function PhonePreview({ form }: { form: typeof EMPTY_FORM }) {
+  const totalEstampitas = Math.max(1, Number(form.totalEstampitas) || 10);
+
+  return (
+    <div className="rounded-[2rem] border-8 border-gray-900 overflow-hidden shadow-xl w-full max-w-[280px] mx-auto lg:mx-0">
+      <div
+        className="relative p-4 min-h-[420px]"
+        style={{ background: "linear-gradient(135deg, #050a14 0%, #0a1628 50%, #050a14 100%)" }}
+      >
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/3 w-56 h-56 rounded-full blur-[80px] opacity-30 pointer-events-none"
+          style={{ background: `radial-gradient(circle, ${form.colorFondo} 0%, transparent 70%)` }}
+        />
+        <div className="relative z-10">
+          {form.tipo === "PUNTOS" ? (
+            <WalletCardPreview
+              tipo="PUNTOS"
+              nombrePrograma={form.nombrePrograma || "Membresía LK"}
+              logoUrl={form.logoUrl || null}
+              colorAcento={form.colorFondo}
+              nombreCliente="Nombre del cliente"
+              puntos={1250}
+              nivelLabel="Oro"
+              porcentaje={60}
+              notaProgreso="750 puntos para llegar a Platino"
+            />
+          ) : (
+            <WalletCardPreview
+              tipo="ESTAMPITAS"
+              nombrePrograma={form.nombrePrograma || "Membresía LK"}
+              logoUrl={form.logoUrl || null}
+              colorAcento={form.colorFondo}
+              totalEstampitas={totalEstampitas}
+              estampitasLlenas={Math.ceil(totalEstampitas / 2)}
+              premioDescripcion={form.premioDescripcion || "Premio por confirmar"}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function WalletDisenosClient({ disenos }: { disenos: Diseno[] }) {
   const router = useRouter();
@@ -154,7 +199,8 @@ export function WalletDisenosClient({ disenos }: { disenos: Diseno[] }) {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 space-y-3">
+        <div className="flex flex-col lg:flex-row gap-4 mb-4 items-start">
+        <form onSubmit={handleSubmit} className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3 flex-1 min-w-0 w-full">
           <p className="font-medium text-blue-800 text-sm">{editId ? "Editar diseño" : "Nuevo diseño"}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input
@@ -278,6 +324,11 @@ export function WalletDisenosClient({ disenos }: { disenos: Diseno[] }) {
             <Button type="button" variant="secondary" size="sm" onClick={closeForm}>Cancelar</Button>
           </div>
         </form>
+        <div className="w-full lg:w-auto flex-shrink-0 lg:sticky lg:top-4">
+          <p className="text-xs font-medium text-gray-500 mb-2 text-center lg:text-left">Vista previa</p>
+          <PhonePreview form={form} />
+        </div>
+        </div>
       )}
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
