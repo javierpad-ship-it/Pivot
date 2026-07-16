@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { NIVEL_LABELS, NIVEL_UMBRALES, calcularProgresoNivel, TIPO_MOVIMIENTO_LABELS } from "@/lib/membresia-lk-constants";
+import { generateSaveToGoogleWalletUrl } from "@/lib/google-wallet";
 import { GlassCard } from "@/components/membresia-lk/GlassCard";
 import { WalletCardPreview } from "@/components/membresia-lk/WalletCardPreview";
 
@@ -68,6 +70,10 @@ export default async function MiTarjetaPage({ params }: Props) {
   const nivelActualIdx = NIVEL_ORDEN_ASC.indexOf(cliente.nivel);
   const mostrarEstampitas = disenoEstampitas && (cliente.estampitas > 0 || cliente.premiosCanjeados > 0);
 
+  const host = headers().get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https";
+  const googleWalletUrl = await generateSaveToGoogleWalletUrl(cliente, disenoPuntos, `${protocol}://${host}`);
+
   return (
     <div
       className="min-h-screen relative overflow-hidden p-4 sm:p-8"
@@ -99,6 +105,22 @@ export default async function MiTarjetaPage({ params }: Props) {
               : "Nivel máximo alcanzado"
           }
         />
+
+        {/* Añadir a Google Wallet */}
+        {googleWalletUrl && (
+          <a
+            href={googleWalletUrl}
+            className="flex items-center justify-center gap-2.5 w-full rounded-full py-3 px-5 font-medium text-sm text-white transition-opacity hover:opacity-90"
+            style={{ background: "#000", border: "1px solid rgba(255,255,255,0.2)" }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7a3 3 0 013-3h12a3 3 0 013 3v10a3 3 0 01-3 3H6a3 3 0 01-3-3V7z" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M3 9.5h18" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="17" cy="14.5" r="1.4" fill="currentColor" />
+            </svg>
+            Añadir a Google Wallet
+          </a>
+        )}
 
         {/* Beneficios por nivel */}
         <GlassCard>
