@@ -41,6 +41,9 @@ model Store {
   name                    String
   distrito                String
   ciudad                  String
+  direccion               String?
+  latitud                 Float? // para ubicaciones en pases de Google/Apple Wallet
+  longitud                Float?
   empresaId               String?
   zonaId                  String?
   formatoDireccion        String? // "FORMATO_1" | "FORMATO_2"
