@@ -22,7 +22,7 @@ export default async function MembresiaLkLayout({ children }: { children: React.
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
         </Link>
-        <p className="flex-1 text-sm font-semibold text-gray-900">Membresía LK</p>
+        <p className="flex-1 font-brand text-base font-bold text-gray-900">Membresía LK</p>
         <LogoutButton className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500" />
       </div>
       <div className="max-w-4xl mx-auto p-4 sm:p-8">{children}</div>

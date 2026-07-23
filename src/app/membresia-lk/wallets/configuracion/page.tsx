@@ -14,7 +14,7 @@ export default async function WalletConfigPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Configuración de Wallets</h1>
+        <h1 className="font-brand text-2xl font-black text-gray-900">Configuración de Wallets</h1>
         <p className="text-sm text-gray-500 mt-1">
           Credenciales de integración con Google Wallet y Apple Wallet. Los secretos se guardan cifrados y nunca
           se muestran de nuevo en pantalla.

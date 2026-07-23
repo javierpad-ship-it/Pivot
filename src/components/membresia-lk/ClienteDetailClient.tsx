@@ -94,7 +94,7 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
       <Card>
         <CardHeader className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">{cliente.nombre}</h1>
+            <h1 className="font-brand text-lg font-bold text-gray-900">{cliente.nombre}</h1>
             <p className="text-xs text-gray-500 mt-0.5">
               {cliente.dni ?? "Sin DNI"} · {cliente.telefono ?? "Sin teléfono"}
               {cliente.store && <> · {cliente.store.name}</>}
@@ -108,11 +108,11 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-xs text-gray-400">Puntos disponibles</p>
-              <p className="text-2xl font-bold text-gray-900">{cliente.puntos}</p>
+              <p className="font-brand text-2xl font-black text-gray-900 tabular-nums">{cliente.puntos}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Puntos acumulados (histórico)</p>
-              <p className="text-2xl font-bold text-gray-900">{cliente.puntosAcumulados}</p>
+              <p className="font-brand text-2xl font-black text-gray-900 tabular-nums">{cliente.puntosAcumulados}</p>
             </div>
           </div>
           {siguiente ? (
@@ -138,7 +138,7 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
 
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Registrar movimiento</h2>
+          <h2 className="font-brand text-sm font-bold text-gray-900">Registrar movimiento</h2>
         </CardHeader>
         <CardBody>
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -187,7 +187,7 @@ export function ClienteDetailClient({ cliente: initial }: { cliente: Cliente }) 
 
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Historial de movimientos</h2>
+          <h2 className="font-brand text-sm font-bold text-gray-900">Historial de movimientos</h2>
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

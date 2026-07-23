@@ -20,7 +20,7 @@ export default async function MembresiaLkPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Membresía LK</h1>
+        <h1 className="font-brand text-2xl font-black text-gray-900">Membresía LK</h1>
         <p className="text-sm text-gray-500 mt-1">Programa de fidelización de clientes</p>
       </div>
       <MembresiaClient

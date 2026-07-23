@@ -18,7 +18,7 @@ export default async function WalletDisenosPage() {
     <div>
       <div className="mb-6 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Diseños de tarjeta</h1>
+          <h1 className="font-brand text-2xl font-black text-gray-900">Diseños de tarjeta</h1>
           <p className="text-sm text-gray-500 mt-1">
             Define cómo se ven las tarjetas de Membresía LK en Google Wallet y Apple Wallet
           </p>
