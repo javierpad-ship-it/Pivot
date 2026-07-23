@@ -124,7 +124,7 @@ export default async function MiTarjetaPage({ params }: Props) {
 
         {/* Beneficios por nivel */}
         <GlassCard>
-          <h2 className="text-sm font-semibold text-white mb-4">Beneficios por nivel</h2>
+          <h2 className="font-brand text-sm font-bold text-white mb-4">Beneficios por nivel</h2>
           <div className="space-y-2.5">
             {NIVEL_ORDEN_ASC.map((nivel, idx) => {
               const alcanzado = idx <= nivelActualIdx;
@@ -163,7 +163,7 @@ export default async function MiTarjetaPage({ params }: Props) {
         {/* Tarjeta de sellos, si aplica */}
         {mostrarEstampitas && disenoEstampitas && (
           <GlassCard>
-            <h2 className="text-sm font-semibold text-white mb-1">Tarjeta de sellos</h2>
+            <h2 className="font-brand text-sm font-bold text-white mb-1">Tarjeta de sellos</h2>
             <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.45)" }}>
               Premio: {disenoEstampitas.premioDescripcion ?? "—"}
             </p>
@@ -192,7 +192,7 @@ export default async function MiTarjetaPage({ params }: Props) {
 
         {/* Historial reciente */}
         <GlassCard className="!p-0 overflow-hidden">
-          <h2 className="text-sm font-semibold text-white p-5 pb-3">Historial reciente</h2>
+          <h2 className="font-brand text-sm font-bold text-white p-5 pb-3">Historial reciente</h2>
           <div>
             {cliente.movimientos.length === 0 ? (
               <p className="px-5 pb-6 text-center text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
@@ -231,7 +231,7 @@ export default async function MiTarjetaPage({ params }: Props) {
           </div>
         </GlassCard>
 
-        <p className="text-center text-xs pt-2 pb-6" style={{ color: "rgba(255,255,255,0.25)" }}>
+        <p className="font-brand text-center text-xs tracking-widest uppercase pt-2 pb-6" style={{ color: "rgba(255,255,255,0.3)" }}>
           Lukers · Membresía LK
         </p>
       </div>

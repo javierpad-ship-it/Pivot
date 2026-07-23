@@ -43,19 +43,19 @@ export function WalletCardPreview(props: Props) {
       </div>
 
       <GlassCard>
-        <p className="text-xs uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
+        <p className="font-brand text-xs uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
           {props.nombrePrograma}
         </p>
 
         {props.tipo === "PUNTOS" ? (
           <>
-            <h1 className="text-xl font-bold mt-1 text-white">{props.nombreCliente}</h1>
+            <h1 className="font-brand text-xl font-bold mt-1 text-white">{props.nombreCliente}</h1>
             <div className="flex items-end justify-between mt-6">
               <div>
                 <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
                   Puntos disponibles
                 </p>
-                <p className="text-4xl font-bold text-white mt-1">{props.puntos}</p>
+                <p className="font-brand text-4xl font-black text-white mt-1">{props.puntos}</p>
               </div>
               <span
                 className="inline-flex px-3 py-1 rounded-full text-xs font-semibold text-white"

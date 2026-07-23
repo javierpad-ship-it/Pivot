@@ -7,7 +7,12 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        // Fuente de marca Lukers (MD Nichrome) — usar en títulos/branding
+        brand: ["var(--font-nichrome)", "system-ui", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };
