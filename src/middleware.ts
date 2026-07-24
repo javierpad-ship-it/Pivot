@@ -43,7 +43,7 @@ export function middleware(req: NextRequest): NextResponse {
   const user = parseSessionCookie(req);
 
   // Public paths — no auth needed
-  if (pathname === "/login" || pathname.startsWith("/api/auth/")) {
+  if (pathname === "/login" || pathname.startsWith("/api/auth/") || pathname.startsWith("/mi-tarjeta/")) {
     if (pathname === "/login" && user) return redirectByRole(user, req);
     return NextResponse.next();
   }
@@ -92,6 +92,15 @@ export function middleware(req: NextRequest): NextResponse {
       if (m && m[1] !== user.zonaId) {
         return NextResponse.redirect(new URL(`/zona/${user.zonaId}`, req.url));
       }
+    }
+    return NextResponse.next();
+  }
+
+  // Membresía LK routes
+  if (pathname.startsWith("/membresia-lk")) {
+    if (!["SUPER_ADMIN", "ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);
+    if (pathname.startsWith("/membresia-lk/wallets") && !["SUPER_ADMIN", "ADMIN"].includes(user.rol)) {
+      return NextResponse.redirect(new URL("/membresia-lk", req.url));
     }
     return NextResponse.next();
   }
