@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { LEGACY_MODULES_ENABLED } from "@/lib/legacy-modules";
 
 const COOKIE = "session";
 
@@ -32,6 +33,13 @@ function redirectByRole(
   req: NextRequest
 ): NextResponse {
   const base = new URL(req.url).origin;
+
+  if (!LEGACY_MODULES_ENABLED) {
+    // Conteo, Descansos and Ventas are hidden — only Mantenimiento stays
+    // reachable (by navigating there manually), everyone else lands blank.
+    return NextResponse.redirect(`${base}/inicio`);
+  }
+
   if (user.rol === "TIENDA") return NextResponse.redirect(`${base}/store/${user.storeId}`);
   if (user.rol === "GERENTE_ZONAL") return NextResponse.redirect(`${base}/zona/${user.zonaId}`);
   if (user.rol === "PROGRAMADOR") return NextResponse.redirect(`${base}/hq/programacion`);
@@ -68,11 +76,25 @@ export function middleware(req: NextRequest): NextResponse {
 
     // GERENTE_ZONAL can only enter HQ through descansos module
     if (user.rol === "GERENTE_ZONAL") {
-      if (pathname.startsWith("/hq/descansos")) return NextResponse.next();
-      return NextResponse.redirect(new URL(user.zonaId ? `/zona/${user.zonaId}` : "/login", req.url));
+      if (LEGACY_MODULES_ENABLED && pathname.startsWith("/hq/descansos")) return NextResponse.next();
+      return redirectByRole(user, req);
     }
 
     if (!hqRoles.includes(user.rol)) return redirectByRole(user, req);
+
+    if (!LEGACY_MODULES_ENABLED) {
+      // Conteo, Descansos and Ventas are hidden — only Mantenimiento stays,
+      // and only for the roles that already had access to it.
+      const isMantenimiento = pathname === "/hq/mantenimiento" || pathname.startsWith("/hq/mantenimiento/");
+      if (user.rol === "PROGRAMADOR" || !isMantenimiento) {
+        return NextResponse.redirect(new URL("/inicio", req.url));
+      }
+      if (pathname.startsWith("/hq/mantenimiento/usuarios") && user.rol !== "SUPER_ADMIN") {
+        return NextResponse.redirect(new URL("/hq/mantenimiento", req.url));
+      }
+      return NextResponse.next();
+    }
+
     if (user.rol === "PROGRAMADOR") {
       const allowed = ["/hq", "/hq/programacion", "/hq/reports", "/hq/cuotas"];
       const ok = allowed.some((p) => pathname === p || pathname.startsWith(p + "/"));
@@ -84,8 +106,9 @@ export function middleware(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
-  // Zona routes
+  // Zona routes — part of the Conteo module, hidden for now
   if (pathname.startsWith("/zona")) {
+    if (!LEGACY_MODULES_ENABLED) return NextResponse.redirect(new URL("/inicio", req.url));
     if (!["SUPER_ADMIN", "GERENTE_ZONAL"].includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "GERENTE_ZONAL") {
       const m = pathname.match(/^\/zona\/([^/]+)/);
@@ -96,8 +119,9 @@ export function middleware(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
-  // Store routes
+  // Store routes — the Conteo module, hidden for now
   if (pathname.startsWith("/store")) {
+    if (!LEGACY_MODULES_ENABLED) return NextResponse.redirect(new URL("/inicio", req.url));
     if (!["SUPER_ADMIN", "TIENDA"].includes(user.rol)) return redirectByRole(user, req);
     if (user.rol === "TIENDA") {
       const m = pathname.match(/^\/store\/([^/]+)/);

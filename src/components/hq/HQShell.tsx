@@ -168,12 +168,12 @@ function ModuleSection({
   defaultOpen?: boolean;
 }) {
   const visible = items.filter((i) => i.roles.includes(userRole));
-  if (visible.length === 0) return null;
-
   const hasActive = visible.some((item) =>
     item.href === "/hq" ? pathname === "/hq" : pathname.startsWith(item.href)
   );
   const [open, setOpen] = useState(defaultOpen ?? hasActive);
+
+  if (visible.length === 0) return null;
 
   return (
     <div>
@@ -257,15 +257,7 @@ function SidebarContent({
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
-        {/* Módulos "Conteo" y "Descansos" ocultos del menú a pedido */}
-        <ModuleSection
-          title="Ventas"
-          color="text-emerald-600"
-          items={VENTAS_ITEMS}
-          userRole={user.rol}
-          pathname={pathname}
-          onClose={onClose}
-        />
+        {/* Módulos "Conteo", "Descansos" y "Ventas" ocultos del menú a pedido */}
         {showMantenimiento && (
           <div>
             <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Sistema</p>
