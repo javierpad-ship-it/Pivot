@@ -242,7 +242,7 @@ function SidebarContent({
             </svg>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">Pivot Store</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">Source Manager</p>
             <p className="text-xs text-gray-400 truncate">Casa Matriz</p>
           </div>
         </div>
@@ -257,26 +257,11 @@ function SidebarContent({
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
-        <ModuleSection
-          title="Conteo"
-          color="text-blue-500"
-          items={CONTEO_ITEMS}
-          userRole={user.rol}
-          pathname={pathname}
-          onClose={onClose}
-        />
+        {/* Módulos "Conteo" y "Descansos" ocultos del menú a pedido */}
         <ModuleSection
           title="Ventas"
           color="text-emerald-600"
           items={VENTAS_ITEMS}
-          userRole={user.rol}
-          pathname={pathname}
-          onClose={onClose}
-        />
-        <ModuleSection
-          title="Descansos"
-          color="text-teal-600"
-          items={DESCANSOS_ITEMS}
           userRole={user.rol}
           pathname={pathname}
           onClose={onClose}
@@ -359,7 +344,7 @@ export function HQShell({ user, children }: { user: SessionUser; children: React
                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-900">Pivot Store</p>
+            <p className="text-sm font-semibold text-gray-900">Source Manager</p>
           </div>
         </div>
         <main className="flex-1">{children}</main>

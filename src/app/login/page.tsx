@@ -84,7 +84,7 @@ function LoginForm() {
           </p>
 
           <h2 className="text-2xl font-bold tracking-tight text-white">
-            Pivot<span style={{ color: "rgb(0,140,255)" }}>Store</span>
+            Source<span style={{ color: "rgb(0,140,255)" }}>Manager</span>
           </h2>
           <p className="text-sm mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>
             Ingresa tus credenciales para continuar

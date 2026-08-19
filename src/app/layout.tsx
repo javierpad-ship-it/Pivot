@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pivot Store",
+  title: "Source Manager",
   description: "Sistema de conteo cíclico de inventario para tiendas Lukers",
 };
 
